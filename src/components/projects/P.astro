@@ -1,0 +1,37 @@
+---
+// Paragraph component - wrapper for text content
+---
+
+<p class="paragraph">
+  <slot />
+</p>
+
+<style>
+  .paragraph {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #1f2937;
+    font-weight: 500;
+    margin: 0 0 1.25rem 0;
+  }
+
+  .paragraph:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 639px) {
+    .paragraph {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .paragraph {
+      font-size: 1.0625rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+</style>

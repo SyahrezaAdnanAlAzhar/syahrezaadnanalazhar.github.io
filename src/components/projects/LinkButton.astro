@@ -1,0 +1,118 @@
+---
+interface Props {
+  type: 'github' | 'figma' | 'huggingface' | 'kaggle';
+  href: string;
+}
+
+const { type, href } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+const buttonConfig = {
+  github: {
+    label: 'GitHub',
+    icon: `${base}/images/contacts/github.svg`,
+    bgColor: '#24292e',
+    hoverColor: '#3a3f44',
+  },
+  figma: {
+    label: 'Figma',
+    icon: `${base}/images/contacts/figma.svg`,
+    bgColor: '#1e1e1e',
+    hoverColor: '#333333',
+  },
+  huggingface: {
+    label: 'Hugging Face',
+    icon: `${base}/images/contacts/huggingface.svg`,
+    bgColor: '#ff9d0b',
+    hoverColor: '#ffb340',
+  },
+  kaggle: {
+    label: 'Kaggle',
+    icon: `${base}/images/contacts/kaggle.svg`,
+    bgColor: '#20beff',
+    hoverColor: '#4dcfff',
+  },
+};
+
+const config = buttonConfig[type];
+---
+
+<a 
+  href={href}
+  class="link-button"
+  data-type={type}
+  target="_blank"
+  rel="noopener noreferrer"
+  style={`--bg-color: ${config.bgColor}; --hover-color: ${config.hoverColor};`}
+>
+  <img src={config.icon} alt={config.label} class="button-icon" />
+  <span class="button-label">{config.label}</span>
+</a>
+
+<style>
+  .link-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--bg-color);
+    color: #ffffff;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+
+  .link-button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 0 #000000;
+  }
+
+  .link-button[data-type="github"]:hover {
+    box-shadow: 4px 4px 0 0 #777777;
+  }
+
+  .button-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  /* GitHub icon needs to be inverted to white */
+  .link-button[data-type="github"] .button-icon {
+    filter: brightness(0) invert(1);
+  }
+
+  /* Figma icon - keep original colors or adjust */
+  .link-button[data-type="figma"] .button-icon {
+    filter: none;
+  }
+
+  /* Hugging Face - keep original colors */
+  .link-button[data-type="huggingface"] .button-icon {
+    filter: none;
+  }
+
+  /* Kaggle - invert to white */
+  .link-button[data-type="kaggle"] .button-icon {
+    filter: brightness(0) invert(1);
+  }
+
+  .button-label {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 639px) {
+    .link-button {
+      padding: 0.625rem 1rem;
+      font-size: 0.875rem;
+      gap: 0.5rem;
+    }
+
+    .button-icon {
+      width: 18px;
+      height: 18px;
+    }
+  }
+</style>

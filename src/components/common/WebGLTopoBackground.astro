@@ -150,7 +150,7 @@ const base = import.meta.env.BASE_URL;
 
       // Only draw if we're at the edge of a band (creates contour lines)
       // Smaller threshold = thinner lines (was 0.005, now 0.003)
-      if (lowerDiff > 0.0024)
+      if (lowerDiff > 0.002)
         discard;
 
       gl_FragColor = vec4(color, 1.0);

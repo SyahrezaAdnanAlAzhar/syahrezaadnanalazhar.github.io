@@ -1,0 +1,67 @@
+---
+interface Props {
+  src: string;
+  caption?: string;
+  alt?: string;
+}
+
+const { src, caption = '', alt = caption } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+// Add base URL if src doesn't already include it and starts with /
+const imageSrc = src.startsWith('/') && !src.startsWith(base) ? `${base}${src}` : src;
+---
+
+<figure class="img-figure">
+  <div class="img-wrapper">
+    <img 
+      src={imageSrc} 
+      alt={alt} 
+      class="img-element"
+      loading="lazy"
+    />
+  </div>
+  {caption && (
+    <figcaption class="img-caption">{caption}</figcaption>
+  )}
+</figure>
+
+<style>
+  .img-figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .img-wrapper {
+    display: block;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 2px solid #e5e7eb;
+  }
+
+  .img-element {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .img-caption {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+    font-style: italic;
+  }
+
+  @media (max-width: 639px) {
+    .img-wrapper {
+      border-radius: 0.5rem;
+    }
+
+    .img-caption {
+      font-size: 0.8125rem;
+      margin-top: 0.5rem;
+    }
+  }
+</style>

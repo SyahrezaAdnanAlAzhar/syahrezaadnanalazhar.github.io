@@ -30,13 +30,13 @@ const projectCollection = defineCollection({
     type: 'content',
     schema: z.object({
         title: z.string(),
-        projectType: z.enum(['software', 'ai']), // Determines card color: software=blue, ai=indigo
+        projectType: z.enum(['software', 'ai']), // Determines card color: software=amber, ai=cyan
         category: z.string(), // Single category badge (e.g., "Mobile Application", "Semantic Segmentation")
         image: z.string(), // Path relative to public folder (e.g., "images/projects/project-slug/cover.png")
         description: z.string(), // Brief description shown on card
         techStack: z.array(z.string()).default([]), // Tech badges (can be empty)
         order: z.number(), // Order within projectType (lower = first)
-        projectLink: z.string().url().optional(), // GitHub or live demo URL
+        projectLink: z.string().optional(), // Optional external link to project (e.g., GitHub, live demo)
     }),
 });
 

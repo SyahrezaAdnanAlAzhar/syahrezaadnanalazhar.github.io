@@ -1,0 +1,240 @@
+---
+title: "Dense-UNet Architecture: Indonesian Food Semantic Segmentation"
+projectType: "ai"
+category: "Semantic Segmentation"
+image: "images/projects/dense-unet-architecture/cover.svg"
+description: "Proposed a semantic segmentation model based on the U-Net architecture, using DenseNet as the encoder and ASPP as the bottleneck module. The model was compared against existing baseline models, including DeepLabV3 with ResNet-50 and YOLOv11-M-Seg. The dataset used consisted of Indonesian food images collected through web scraping."
+techStack: ["TensorFlow", "OpenCV", "PyTorch", "Ultralytics"]
+order: 1
+---
+
+import Section from "@/components/projects/Section.astro";
+import Callout from "@/components/projects/Callout.astro";
+import ImageGrid from "@/components/projects/ImageGrid.astro";
+import Img from "@/components/projects/Img.astro";
+import P from "@/components/projects/P.astro";
+import B from "@/components/projects/B.astro";
+import Mark from "@/components/projects/Mark.astro";
+import Table from "@/components/projects/Table.astro";
+import LinkButtons from "@/components/projects/LinkButtons.astro";
+import LinkButton from "@/components/projects/LinkButton.astro";
+
+<LinkButtons>
+  <LinkButton
+    type="github"
+    href="https://github.com/SyahrezaAdnanAlAzhar/dense-u-net-food-segmentation"
+  />
+</LinkButtons>
+
+{/* ========================================================================= */}
+{/* SECTION 1: PROJECT OVERVIEW */}
+{/* ========================================================================= */}
+
+<Section title="Project Overview" defaultOpen={true}>
+
+<P>
+  To address the <Mark>lack of efficient AI tools for local cuisine</Mark>, I developed a lightweight DenseNet-based U-Net (Dense-UNet) for semantic segmentation of Indonesian food. I curated a custom dataset of complex dishes to train the model, <Mark> prioritizing a balance between high accuracy and computational speed</Mark> suitable for real-world deployment. The architecture was successfully validated against industry standards DeepLabV3+ and YOLOv11-Seg, proving its effectiveness for resource-constrained environments.
+</P>
+
+<P>
+  The project covers the full pipeline, from dataset collection and annotation to model design, training, evaluation, and comparative analysis.
+</P>
+
+<Table>
+  | <B>Aspect</B> | <B>Description</B> |
+  | ------- | ----------------------------------- |
+  | Task | Semantic Segmentation |
+  | Domain | Indonesian Food Images |
+  | Models | Dense-UNet, DeepLabV3+, YOLOv11-Seg |
+  | Metrics | mIoU, Pixel Accuracy |
+  | Focus | Accuracy-Efficiency Trade-off |
+</Table>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 2: DATASET & ISSUES */}
+{/* ========================================================================= */}
+
+<Section title="Dataset and Its Issues" defaultOpen={true}>
+
+<P>
+  To address the lack of representative data for local cuisine, I developed a <Mark>custom dataset containing approximately 600 manually annotated images</Mark>, covering six common Indonesian dishes. This data was rigorously curated and labeled using Roboflow. The dataset is designed to evaluate model robustness in authentic environments while maintaining the specific visual complexity of the real world:
+</P>
+
+<ul class="custom-list">
+  <li>
+    <B>Overlapping Ingredients</B>: Dense arrangement of food items where ingredients frequently obscure one another.
+  </li>
+  <li>
+    <B>Inconsistent Lighting</B>: Varied illumination levels typical of non-studio, real-world photography.
+  </li>
+  <li>
+    <B>Texture Ambiguity</B>: High visual similarity between distinct food components that complicates boundary detection.
+  </li>
+</ul>
+
+<ImageGrid cols={2}>
+  <Img
+    src="/images/projects/dense-unet-architecture/ayam1.svg"
+    caption="Original image sample ayam 1"
+  />
+  <Img
+    src="/images/projects/dense-unet-architecture/ayam2.png"
+    caption="Original image sample ayam 2"
+  />
+  <Img
+    src="/images/projects/dense-unet-architecture/ayam3.png"
+    caption="Original image sample ayam 3"
+  />
+</ImageGrid>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 3: TECHNICAL DECISIONS */}
+{/* ========================================================================= */}
+
+<Section title="Technical Decisions" defaultOpen={false}>
+
+<P>
+  Prioritizing implementation on devices with limited resources, I designed a specialized architecture that emphasizes computational efficiency over the raw cost of transformer-based models. I used a modified U-Net framework as the main foundation, optimizing it specifically to handle the complex textures and spatial details of Indonesian cuisine through three strategic technical integrations, as follows:
+</P>
+
+<ul class="custom-list">
+  <li>
+    <B>DenseNet Encoder</B>: Selected to maximize feature reuse and improve gradient flow, allowing the model to learn fine-grained food textures with fewer parameters.
+  </li>
+  <li>
+    <B>ASPP (Atrous Spatial Pyramid Pooling)</B>: Integrated at the bottleneck to capture multi-scale context, ensuring the model understands global object relationships without significantly increasing model size.
+  </li>
+  <li>
+    <B>Attention Mechanisms</B>: Embedded within skip connections to refine feature fusion, dynamically emphasizing relevant food boundaries while suppressing background noise during decoding.
+  </li>
+</ul>
+
+<Callout type="tip">
+  The architecture prioritizes parameter efficiency and deployability over marginal accuracy gains.
+</Callout>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 4: EXPERIMENTAL SETUP */}
+{/* ========================================================================= */}
+
+<Section title="Experimental Setup" defaultOpen={false}>
+
+<P>
+  To ensure a fair and consistent benchmark across all models, the following training configuration was strictly maintained:
+</P>
+
+<Table>
+  | <B>Component</B> | <B>Configuration Details</B> |
+  | ------- | ----------------------------------- |
+  | Input Resolution | 512 × 512 pixels |
+  | Data Augmentation | On-the-fly random flips, rotations, and brightness adjustments |
+  | Splitting Strategy | Stratified sampling (to maintain class balance across Train/Val/Test) |
+  | Optimizer | Adam with scheduled learning rate decay |
+  | Primary Metric | Validation Mean Intersection over Union (mIoU) |
+</Table>
+
+<Callout type="info">
+  All baseline models were trained from scratch on the same dataset to avoid bias from external pretraining.
+</Callout>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 5: RESULTS & COMPARISON */}
+{/* ========================================================================= */}
+
+<Section title="Results & Comparison" defaultOpen={true}>
+
+<P>
+  Quantitative evaluation indicates that <Mark>Dense-UNet achieves competitive segmentation performance</Mark> in terms of mean Intersection over Union (mIoU) while using substantially <Mark>fewer parameters than larger baseline models</Mark>. Although DeepLabV3+ attains the highest mIoU on the curated dataset, the proposed Dense-UNet demonstrates comparable segmentation quality despite operating with <Mark>roughly half the number of learnable parameters.</Mark>
+</P>
+
+<P>
+  Qualitative inspection further supports these findings. Dense-UNet produces coherent segmentation masks on complex Indonesian dishes with overlapping ingredients, maintaining stable boundaries across visually dense regions. In comparison, instance-based approaches such as YOLOv11-Seg occasionally exhibit fragmented contours in closely packed food components, highlighting the suitability of encoder-decoder architectures for this task.
+</P>
+
+<Table>
+  | <B>Model</B> | <B>Accuracy</B> | <B>Efficiency</B> |
+  | ----------- | ----------- | ---------- |
+  | DeepLabV3+ | Highest | Low |
+  | YOLOv11-Seg | Competitive | High |
+  | Dense U-Net | Competitive | Very High |
+</Table>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 6: DETAILED RESULTS */}
+{/* ========================================================================= */}
+
+<Section title="Detailed Results" defaultOpen={false}>
+
+<P>
+  Detailed quantitative metrics (mIoU, inference speed, parameter count) are available below.
+</P>
+
+<Table>
+  | <B>Model</B> | <B>mIoU</B> | <B>Params (M)</B> |
+  | ----------- | ----- | ---------- |
+  | DeepLabV3+ | 0.93 | 39 |
+  | YOLOv11-Seg | 0.74 | 22 |
+  | Dense U-Net | 0.81 | 19 |
+</Table>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 7: TAKEAWAYS & TRADE-OFFS */}
+{/* ========================================================================= */}
+
+<Section title="Takeaways & Trade-offs" defaultOpen={true}>
+
+<P>
+  The results highlight a clear trade-off between architectural complexity and deployment practicality. While larger models offer marginal accuracy improvements, they introduce significant computational overhead that limits real-world usability.
+</P>
+
+<P>
+  <Mark>Dense-UNet</Mark> demonstrates that carefully designed convolutional architectures can <Mark>still compete with modern baselines when optimized for efficiency</Mark>. However, performance degradation is observed on translucent ingredients, indicating limitations in handling low-contrast areas.
+</P>
+
+<P>Trade-off Table:</P>
+
+<Table>
+  | <B>Aspect</B> | <B>Observation</B> |
+  | ---------- | ------------------------- |
+  | Accuracy | Slightly below DeepLabV3+ |
+  | Efficiency | Significantly better |
+  | Robustness | Strong on textured foods |
+  | Weakness | Translucent areas |
+</Table>
+
+<Callout type="warning">
+  Lightweight architectures still struggle with low-contrast or translucent food components.
+</Callout>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 8: WHAT I'D DO NEXT */}
+{/* ========================================================================= */}
+
+<Section title="What I'd Do Next" defaultOpen={true}>
+
+<P>
+  Given more time and resources, future improvements would focus on addressing translucent ingredient segmentation and improving generalization across broader food categories. Planned enhancements include:
+</P>
+
+<ul class="custom-list">
+  <li>Expanding the dataset</li>
+  <li>Exploring hybrid attention mechanisms for low-contrast areas</li>
+  <li>Model distillation for mobile deployment</li>
+  <li>Integrating nutrient estimation on top of segmentation outputs</li>
+</ul>
+
+</Section>

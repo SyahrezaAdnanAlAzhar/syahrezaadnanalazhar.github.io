@@ -1,0 +1,191 @@
+---
+interface Props {
+  title: string;
+  defaultOpen?: boolean;
+}
+
+const { title, defaultOpen = true } = Astro.props;
+const sectionId = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+---
+
+<div class="section-wrapper" data-section-id={sectionId} data-default-open={defaultOpen}>
+  <button 
+    class="section-header" 
+    type="button"
+    aria-expanded={defaultOpen}
+    aria-controls={`section-content-${sectionId}`}
+  >
+    <h2 class="section-title">{title}</h2>
+    <svg 
+      class="chevron-icon" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path 
+        d="M6 9L12 15L18 9" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+  
+  <div 
+    class="section-content" 
+    id={`section-content-${sectionId}`}
+  >
+    <slot />
+  </div>
+</div>
+
+<style>
+  .section-wrapper {
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    border-bottom: 2px solid #e5e7eb;
+    transition: border-color 0.3s ease;
+  }
+
+  .section-header:hover {
+    border-color: #f97316;
+  }
+
+  .section-title {
+    font-family: 'Quantico', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+    transition: color 0.3s ease;
+  }
+
+  /* Collapsed state - orange title */
+  .section-wrapper[data-collapsed="true"] .section-title {
+    color: #f97316;
+  }
+
+  .chevron-icon {
+    flex-shrink: 0;
+    color: #000000;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  /* Collapsed state - rotate chevron and change color */
+  .section-wrapper[data-collapsed="true"] .chevron-icon {
+    transform: rotate(-90deg);
+    color: #f97316;
+  }
+
+  .section-content {
+    padding-top: 1.5rem;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
+  }
+
+  /* Collapsed state - hide content */
+  .section-wrapper[data-collapsed="true"] .section-content {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+  }
+
+  /* Expanded state */
+  .section-wrapper:not([data-collapsed="true"]) .section-content {
+    max-height: 5000px;
+    opacity: 1;
+  }
+
+  /* Responsive */
+  @media (max-width: 639px) {
+    .section-title {
+      font-size: 1.25rem;
+    }
+
+    .section-header {
+      padding: 0.75rem 0;
+    }
+
+    .section-content {
+      padding-top: 1rem;
+    }
+
+    .chevron-icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .section-title {
+      font-size: 1.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-wrapper {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+    }
+
+    .section-content {
+      padding-top: 2rem;
+    }
+  }
+</style>
+
+<script>
+  function initSections() {
+    const sections = document.querySelectorAll('.section-wrapper');
+    
+    sections.forEach((section) => {
+      const header = section.querySelector('.section-header');
+      const defaultOpen = section.getAttribute('data-default-open') === 'true';
+      
+      // Set initial state
+      if (!defaultOpen) {
+        section.setAttribute('data-collapsed', 'true');
+        header?.setAttribute('aria-expanded', 'false');
+      }
+      
+      header?.addEventListener('click', () => {
+        const isCollapsed = section.getAttribute('data-collapsed') === 'true';
+        
+        if (isCollapsed) {
+          section.removeAttribute('data-collapsed');
+          header.setAttribute('aria-expanded', 'true');
+        } else {
+          section.setAttribute('data-collapsed', 'true');
+          header.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSections);
+  } else {
+    initSections();
+  }
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initSections);
+</script>

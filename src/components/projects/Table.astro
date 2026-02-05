@@ -1,0 +1,149 @@
+---
+// Table component - renders markdown tables with custom styling
+// On mobile, transforms to card stack layout
+---
+
+<div class="table-wrapper">
+  <div class="table-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .table-wrapper {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  .table-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  .table-content :global(thead) {
+    background-color: #f97316;
+  }
+
+  .table-content :global(th) {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    font-weight: 700;
+    color: #ffffff;
+    border-bottom: 2px solid #ea580c;
+    font-family: 'Quantico', sans-serif;
+  }
+
+  .table-content :global(tbody tr) {
+    background-color: #ffffff;
+  }
+
+  .table-content :global(td) {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+    font-weight: 500;
+  }
+
+  .table-content :global(tr:last-child td) {
+    border-bottom: none;
+  }
+
+  .table-content :global(tbody tr:hover) {
+    background-color: #fef3c7;
+  }
+
+  /* Bold cells styling */
+  .table-content :global(td strong) {
+    font-weight: 700;
+    color: #000000;
+  }
+
+  .table-content :global(th strong) {
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  /* Mobile Card Stack */
+  @media (max-width: 639px) {
+    .table-content :global(table) {
+      display: block;
+    }
+
+    .table-content :global(thead) {
+      display: none;
+    }
+
+    .table-content :global(tbody) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .table-content :global(tr) {
+      display: flex;
+      flex-direction: column;
+      background-color: #f9fafb;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      border: 1px solid #e5e7eb;
+    }
+
+    .table-content :global(td) {
+      display: flex;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table-content :global(td:last-child) {
+      border-bottom: none;
+    }
+
+    .table-content :global(td::before) {
+      content: attr(data-label);
+      font-weight: 700;
+      color: #000000;
+      min-width: 40%;
+      margin-right: 0.5rem;
+    }
+
+    .table-content :global(tbody tr:hover) {
+      background-color: #f3f4f6;
+    }
+  }
+</style>
+
+<script>
+  function initTables() {
+    const tables = document.querySelectorAll('.table-content table');
+    
+    tables.forEach((table) => {
+      const headers: string[] = [];
+      const headerCells = table.querySelectorAll('thead th');
+      
+      headerCells.forEach((th) => {
+        headers.push(th.textContent?.trim() || '');
+      });
+      
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll('td');
+        cells.forEach((cell, index) => {
+          if (headers[index]) {
+            cell.setAttribute('data-label', headers[index] + ': ');
+          }
+        });
+      });
+    });
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTables);
+  } else {
+    initTables();
+  }
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initTables);
+</script>

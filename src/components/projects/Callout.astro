@@ -1,0 +1,129 @@
+---
+interface Props {
+  type: 'info' | 'warning' | 'success' | 'tip';
+}
+
+const { type = 'info' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+const typeConfig = {
+  info: {
+    icon: `${base}/images/projects/callout-icons/info.svg`,
+    bgColor: '#f5f5f5',
+    borderColor: '#000000',
+    iconColor: '#000000',
+  },
+  warning: {
+    icon: `${base}/images/projects/callout-icons/warning.svg`,
+    bgColor: '#fef2f2',
+    borderColor: '#ef4444',
+    iconColor: '#ef4444',
+  },
+  success: {
+    icon: `${base}/images/projects/callout-icons/success.svg`,
+    bgColor: '#f0fdf4',
+    borderColor: '#22c55e',
+    iconColor: '#22c55e',
+  },
+  tip: {
+    icon: `${base}/images/projects/callout-icons/tip.svg`,
+    bgColor: '#eff6ff',
+    borderColor: '#3b82f6',
+    iconColor: '#3b82f6',
+  },
+};
+
+const config = typeConfig[type];
+---
+
+<div 
+  class="callout" 
+  data-type={type}
+  style={`
+    background-color: ${config.bgColor};
+    border-color: ${config.borderColor};
+  `}
+>
+  <div class="callout-icon" style={`color: ${config.iconColor};`}>
+    <img src={config.icon} alt={type} class="icon-img" />
+  </div>
+  <div class="callout-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .callout-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 0.125rem;
+  }
+
+  .icon-img {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Color filters for SVG icons */
+  .callout[data-type="info"] .icon-img {
+    filter: brightness(0) saturate(100%);
+  }
+
+  .callout[data-type="warning"] .icon-img {
+    filter: brightness(0) saturate(100%) invert(36%) sepia(93%) saturate(1352%) hue-rotate(346deg) brightness(104%) contrast(88%);
+  }
+
+  .callout[data-type="success"] .icon-img {
+    filter: brightness(0) saturate(100%) invert(55%) sepia(52%) saturate(557%) hue-rotate(93deg) brightness(97%) contrast(91%);
+  }
+
+  .callout[data-type="tip"] .icon-img {
+    filter: brightness(0) saturate(100%) invert(42%) sepia(98%) saturate(1182%) hue-rotate(200deg) brightness(96%) contrast(96%);
+  }
+
+  .callout-content {
+    flex: 1;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: #1f2937;
+    font-weight: 500;
+  }
+
+  .callout-content :global(p) {
+    margin: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 639px) {
+    .callout {
+      padding: 0.875rem 1rem;
+      gap: 0.75rem;
+    }
+
+    .callout-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .icon-img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .callout-content {
+      font-size: 0.875rem;
+    }
+  }
+</style>

@@ -1,0 +1,260 @@
+---
+# =============================================================================
+# PROJECT TEMPLATE - MDX FORMAT
+# =============================================================================
+# Copy this file and rename it for your new project.
+# Fill in the frontmatter and content sections below.
+# Delete this comment block when done.
+# =============================================================================
+
+title: "Dense-UNet Architecture: Indonesian Food Semantic Segmentation"
+projectType: "ai"
+category: "Semantic Segmentation"
+image: "images/projects/dense-unet-architecture/cover.svg"
+description: "Proposed a semantic segmentation model based on the U-Net architecture, using DenseNet as the encoder and ASPP as the bottleneck module. The model was compared against existing baseline models, including DeepLabV3 with ResNet-50 and YOLOv11-M-Seg. The dataset used consisted of Indonesian food images collected through web scraping."
+techStack: ["TensorFlow", "OpenCV", "PyTorch", "Ultralytics"]
+order: 1
+---
+
+import Section from "@/components/projects/Section.astro";
+import Callout from "@/components/projects/Callout.astro";
+import ImageGrid from "@/components/projects/ImageGrid.astro";
+import Img from "@/components/projects/Img.astro";
+import P from "@/components/projects/P.astro";
+import B from "@/components/projects/B.astro";
+import Mark from "@/components/projects/Mark.astro";
+import Table from "@/components/projects/Table.astro";
+import LinkButtons from "@/components/projects/LinkButtons.astro";
+import LinkButton from "@/components/projects/LinkButton.astro";
+
+{/* ========================================================================= */}
+{/* LINK BUTTONS - Placed below main image */}
+{/* Available types: github, figma, huggingface, kaggle */}
+{/* ========================================================================= */}
+
+<LinkButtons>
+  <LinkButton type="github" href="https://github.com/username/repo" />
+  <LinkButton type="figma" href="https://figma.com/file/xxx" />
+  <LinkButton type="huggingface" href="https://huggingface.co/username/model" />
+  <LinkButton type="kaggle" href="https://kaggle.com/username/dataset" />
+</LinkButtons>
+
+{/* ========================================================================= */}
+{/* SECTION 1: PROJECT OVERVIEW */}
+{/* ========================================================================= */}
+
+<Section title="Project Overview">
+
+<P>
+  This is a regular paragraph. You can use <B>bold text</B> for emphasis and{" "}
+  <Mark>highlighted text</Mark> for key terms or important phrases. Mix them as
+  needed:{" "}
+  <B>
+    bold with <Mark>nested highlight</Mark>
+  </B>{" "}
+  works too.
+</P>
+
+<P>
+  Another paragraph with different styling examples. The <B>Dense-UNet</B>
+  architecture combines the benefits of <Mark>dense connections</Mark> with the{" "}
+  <B>encoder-decoder</B> structure of U-Net.
+</P>
+
+{/* Table with explicit bold markers for styled cells */}
+
+<Table>
+  | Aspect | Details | |--------|---------| | **Role** | Machine Learning
+  Engineer | | **Duration** | 3 months | | **Team Size** | 4 members | | **Tech
+  Stack** | Python, TensorFlow, OpenCV |
+</Table>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 2: DATASET & ISSUES */}
+{/* ========================================================================= */}
+
+<Section title="Dataset & Its Issues">
+
+<P>
+  The dataset consisted of <B>5,000 medical images</B> with corresponding
+  segmentation masks. However, we encountered several{" "}
+  <Mark>data quality issues</Mark>
+  that required preprocessing.
+</P>
+
+{/* Callout variants: info, warning, success, tip */}
+
+<Callout type="warning">
+  The dataset had significant class imbalance, with background pixels
+  outnumbering foreground pixels by a ratio of 10:1.
+</Callout>
+
+<Callout type="info">
+  All images were normalized to 256x256 resolution before training to ensure
+  consistent input dimensions.
+</Callout>
+
+{/* Image Grid - adjust cols as needed (1, 2, 3, etc.) */}
+
+<ImageGrid cols={2}>
+  <Img
+    src="/images/projects/your-folder/dataset-sample-1.png"
+    caption="Original image sample"
+  />
+  <Img
+    src="/images/projects/your-folder/dataset-sample-2.png"
+    caption="Ground truth mask"
+  />
+</ImageGrid>
+
+<ImageGrid cols={3}>
+  <Img
+    src="/images/projects/your-folder/issue-1.png"
+    caption="Noise artifacts"
+  />
+  <Img
+    src="/images/projects/your-folder/issue-2.png"
+    caption="Inconsistent labeling"
+  />
+  <Img
+    src="/images/projects/your-folder/issue-3.png"
+    caption="Class imbalance visualization"
+  />
+</ImageGrid>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 3: TECHNICAL DECISIONS */}
+{/* ========================================================================= */}
+
+<Section title="Technical Decisions">
+
+<P>
+  We chose <B>Dense-UNet</B> over standard U-Net because dense connections
+  provide <Mark>better gradient flow</Mark> and <Mark>feature reuse</Mark>
+  throughout the network.
+</P>
+
+<P>
+  The architecture uses <B>DenseBlocks</B> in both encoder and decoder paths,
+  with <B>transition layers</B> for downsampling and upsampling operations.
+</P>
+
+<Callout type="tip">
+  Dense connections reduce the number of parameters while maintaining
+  representational power, making the model more efficient to train.
+</Callout>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 4: EXPERIMENTAL SETUP */}
+{/* ========================================================================= */}
+
+<Section title="Experimental Setup">
+
+<P>
+  All experiments were conducted on a <B>single NVIDIA RTX 3090</B> GPU with{" "}
+  <B>24GB VRAM</B>. Training was performed using the
+  <Mark>Adam optimizer</Mark> with a learning rate of <Mark>1e-4</Mark>.
+</P>
+
+<Table>
+  | Parameter | Value | |-----------|-------| | **Batch Size** | 16 | |
+  **Learning Rate** | 1e-4 | | **Epochs** | 100 | | **Optimizer** | Adam | |
+  **Loss Function** | Dice + BCE |
+</Table>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 5: RESULTS & COMPARISON */}
+{/* ========================================================================= */}
+
+<Section title="Results & Comparison">
+
+<Callout type="success">
+  Our Dense-UNet achieved a Dice score of 0.923, outperforming the baseline
+  U-Net by 4.2%.
+</Callout>
+
+<Table>
+  | Model | Dice Score | IoU | Precision | Recall |
+  |-------|------------|-----|-----------|--------| | U-Net | 0.881 | 0.792 |
+  0.875 | 0.889 | | **Dense-UNet (Ours)** | **0.923** | **0.858** | **0.918** |
+  **0.929** | | Attention U-Net | 0.908 | 0.832 | 0.901 | 0.916 |
+</Table>
+
+<ImageGrid cols={2}>
+  <Img
+    src="/images/projects/your-folder/result-1.png"
+    caption="Prediction vs Ground Truth"
+  />
+  <Img
+    src="/images/projects/your-folder/result-2.png"
+    caption="Loss curve comparison"
+  />
+</ImageGrid>
+
+<P>
+  The <B>Dense-UNet</B> shows particularly strong performance on
+  <Mark>small object segmentation</Mark> where standard U-Net struggles with
+  fine details.
+</P>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 6: TAKEAWAYS & TRADE-OFFS */}
+{/* ========================================================================= */}
+
+<Section title="Takeaways & Trade-offs">
+
+<Table>
+  | Aspect | Advantage | Trade-off | |--------|-----------|-----------| |
+  **Dense Connections** | Better gradient flow | Higher memory usage | | **Deep
+  Architecture** | Captures complex features | Longer training time | | **Skip
+  Connections** | Preserves spatial info | Increased model size |
+</Table>
+
+<P>
+  The main <Mark>trade-off</Mark> is between <B>accuracy</B> and
+  <B>computational cost</B>. Dense-UNet requires approximately
+  <Mark>40% more GPU memory</Mark> than standard U-Net.
+</P>
+
+<Callout type="info">
+  For resource-constrained environments, consider using a lighter backbone or
+  reducing the growth rate of dense blocks.
+</Callout>
+
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 7: WHAT I'D DO NEXT */}
+{/* ========================================================================= */}
+
+<Section title="What I'd Do Next">
+
+<P>
+  If I were to continue this project, I would explore the following
+  improvements:
+</P>
+
+<P>
+  - Implement <B>mixed precision training</B> to reduce memory usage -
+  Experiment with <Mark>attention mechanisms</Mark> in skip connections - Add{" "}
+  <B>test-time augmentation</B> for more robust predictions - Explore{" "}
+  <Mark>knowledge distillation</Mark> to create a lighter model - Benchmark on
+  additional <B>medical imaging datasets</B>
+</P>
+
+<Callout type="tip">
+  Future work could also explore combining Dense-UNet with transformer-based
+  architectures for even better performance.
+</Callout>
+
+</Section>
