@@ -3,6 +3,75 @@
 @plugin "@tailwindcss/typography";
 
 /* ===================================
+   SELF-HOSTED FONTS
+   =================================== */
+
+/* Quantico - Heading Font */
+@font-face {
+  font-family: "Quantico";
+  src: url("/syahreza_adnan_portfolio/fonts/Quantico/Quantico-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Quantico";
+  src: url("/syahreza_adnan_portfolio/fonts/Quantico/Quantico-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Montserrat - Body Font */
+@font-face {
+  font-family: "Montserrat";
+  src: url("/syahreza_adnan_portfolio/fonts/Montserrat/Montserrat-Light.woff2")
+    format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("/syahreza_adnan_portfolio/fonts/Montserrat/Montserrat-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("/syahreza_adnan_portfolio/fonts/Montserrat/Montserrat-Medium.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("/syahreza_adnan_portfolio/fonts/Montserrat/Montserrat-SemiBold.woff2")
+    format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("/syahreza_adnan_portfolio/fonts/Montserrat/Montserrat-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===================================
    CUSTOM THEME CONFIGURATION
    =================================== */
 

@@ -47,15 +47,10 @@ const base = import.meta.env.BASE_URL;
     <link rel="apple-touch-icon" href={`${base}/images/profile_picture.jpg`} />
     <link rel="shortcut icon" type="image/jpeg" href={`${base}/images/profile_picture.jpg`} />
     
-    <!-- Preconnect to Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Preload critical fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Montserrat:wght@300;400;500;600;700&display=swap" as="style" />
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Preload Critical Fonts (most used weights first) -->
+    <link rel="preload" href={`${base}/fonts/Montserrat/Montserrat-Regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}/fonts/Montserrat/Montserrat-Bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}/fonts/Quantico/Quantico-Bold.woff2`} as="font" type="font/woff2" crossorigin />
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#F5F2EB" />
