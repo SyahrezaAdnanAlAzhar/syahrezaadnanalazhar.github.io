@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import SectionHeading from '../ui/SectionHeading.astro';
 
 const base = import.meta.env.BASE_URL;
+const baseUrl = base.endsWith('/') ? base : `${base}/`;
 
 // Get all awards and sort by order
 const allAwards = (await getCollection('awards'))
@@ -33,7 +34,7 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
           <!-- Organizer Logo -->
           <div class="award-logo-container">
             <img 
-              src={`${base}/${award.data.image}`}
+              src={`${baseUrl}${award.data.image}`}
               alt={award.data.organizer}
               class="award-logo"
               loading="lazy"
@@ -60,7 +61,7 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
           <!-- Organizer Logo -->
           <div class="award-logo-container">
             <img 
-              src={`${base}/${award.data.image}`}
+              src={`${baseUrl}${award.data.image}`}
               alt={award.data.organizer}
               class="award-logo"
               loading="lazy"

@@ -17,6 +17,8 @@ const categoryColors = {
 };
 
 const colorClass = category ? categoryColors[category] : categoryColors.other;
+const base = import.meta.env.BASE_URL;
+const baseUrl = base.endsWith('/') ? base : `${base}/`;
 ---
 
 <div class={`
@@ -29,7 +31,7 @@ const colorClass = category ? categoryColors[category] : categoryColors.other;
   <!-- Icon -->
   <div class="flex flex-col items-center gap-3">
     <img 
-      src={`${import.meta.env.BASE_URL}/${icon}`} 
+      src={`${baseUrl}${icon}`} 
       alt={`${name} icon`}
       class="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110"
       loading="lazy"

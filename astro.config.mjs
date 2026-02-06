@@ -10,8 +10,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://syahrezaadnanalalzhar.github.io",
-  base: "/syahreza_adnan_portfolio",
+  site: "https://syahrezaadnanalazhar.github.io",
+  base: "/",
   integrations: [mdx()],
   vite: {
     plugins: [tailwindcss()],

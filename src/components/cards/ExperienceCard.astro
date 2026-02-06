@@ -22,6 +22,9 @@ const {
   isRemote = false,
   class: className = ''
 } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const baseUrl = base.endsWith('/') ? base : `${base}/`;
 ---
 
 <div class={`experience-card-wrapper ${className}`}>
@@ -32,7 +35,7 @@ const {
       <div class="card-header">
         <div class="logo-container">
           <img 
-            src={`${import.meta.env.BASE_URL}/${image}`} 
+            src={`${baseUrl}${image}`} 
             alt={`${company} logo`}
             class="company-logo"
             loading="lazy"

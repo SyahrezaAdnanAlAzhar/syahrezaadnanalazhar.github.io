@@ -1,6 +1,10 @@
 ---
 import SectionHeading from '../ui/SectionHeading.astro';
 
+// Get base URL for image paths
+const base = import.meta.env.BASE_URL;
+const baseUrl = base.endsWith('/') ? base : `${base}/`;
+
 // EmailJS config from environment variables
 const emailjsPublicKey = import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY;
 const emailjsServiceId = import.meta.env.PUBLIC_EMAILJS_SERVICE_ID;
@@ -51,7 +55,7 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
         <!-- Profile Picture -->
         <div class="profile-picture-wrapper">
           <img 
-            src={`${import.meta.env.BASE_URL}/images/profile_picture.jpg`}
+            src={`${baseUrl}images/profile_picture.jpg`}
             alt="Syahreza Adnan"
             class="profile-picture"
             loading="lazy"
@@ -65,7 +69,7 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
         <div class="social-card email-card" data-card-type="email">
           <div class="social-icon-wrapper email-icon">
             <img 
-              src={`${import.meta.env.BASE_URL}/images/contacts/gmail.svg`}
+              src={`${baseUrl}images/contacts/gmail.svg`}
               alt="Email"
               class="social-icon"
               loading="lazy"
@@ -102,13 +106,13 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
           >
             <div class="social-icon-wrapper">
               <img 
-                src={`${import.meta.env.BASE_URL}/images/contacts/${social.icon}`}
+                src={`${baseUrl}images/contacts/${social.icon}`}
                 alt={social.name}
                 class="social-icon icon-default"
                 loading="lazy"
               />
               <img 
-                src={`${import.meta.env.BASE_URL}/images/contacts/${social.iconHover}`}
+                src={`${baseUrl}images/contacts/${social.iconHover}`}
                 alt={social.name}
                 class="social-icon icon-hover"
                 loading="lazy"

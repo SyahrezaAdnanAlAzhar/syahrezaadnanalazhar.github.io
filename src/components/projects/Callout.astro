@@ -5,28 +5,29 @@ interface Props {
 
 const { type = 'info' } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const baseUrl = base.endsWith('/') ? base : `${base}/`;
 
 const typeConfig = {
   info: {
-    icon: `${base}/images/projects/callout-icons/info.svg`,
+    icon: `${baseUrl}images/projects/callout-icons/info.svg`,
     bgColor: '#f5f5f5',
     borderColor: '#000000',
     iconColor: '#000000',
   },
   warning: {
-    icon: `${base}/images/projects/callout-icons/warning.svg`,
+    icon: `${baseUrl}images/projects/callout-icons/warning.svg`,
     bgColor: '#fef2f2',
     borderColor: '#ef4444',
     iconColor: '#ef4444',
   },
   success: {
-    icon: `${base}/images/projects/callout-icons/success.svg`,
+    icon: `${baseUrl}images/projects/callout-icons/success.svg`,
     bgColor: '#f0fdf4',
     borderColor: '#22c55e',
     iconColor: '#22c55e',
   },
   tip: {
-    icon: `${base}/images/projects/callout-icons/tip.svg`,
+    icon: `${baseUrl}images/projects/callout-icons/tip.svg`,
     bgColor: '#eff6ff',
     borderColor: '#3b82f6',
     iconColor: '#3b82f6',

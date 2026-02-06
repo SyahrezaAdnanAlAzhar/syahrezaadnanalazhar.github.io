@@ -9,8 +9,9 @@ interface Props {
 
 const { title, description = "Syahreza Adnan - Software Engineering Student | Full Stack Developer | AI/ML Enthusiast" } = Astro.props;
 
-const site = "https://syahrezaadnanalalzhar.github.io/syahreza_adnan_portfolio/";
+const site = "https://syahrezaadnanalazhar.github.io/";
 const base = import.meta.env.BASE_URL;
+const baseUrl = base.endsWith('/') ? base : `${base}/`;
 ---
 
 <!doctype html>
@@ -43,14 +44,14 @@ const base = import.meta.env.BASE_URL;
     <meta property="twitter:image" content={`${site}images/profile_picture.jpg`} />
     
     <!-- Favicon - Profile Picture -->
-    <link rel="icon" type="image/jpeg" href={`${base}/images/profile_picture.jpg`} />
-    <link rel="apple-touch-icon" href={`${base}/images/profile_picture.jpg`} />
-    <link rel="shortcut icon" type="image/jpeg" href={`${base}/images/profile_picture.jpg`} />
+    <link rel="icon" type="image/jpeg" href={`${baseUrl}images/profile_picture.jpg`} />
+    <link rel="apple-touch-icon" href={`${baseUrl}images/profile_picture.jpg`} />
+    <link rel="shortcut icon" type="image/jpeg" href={`${baseUrl}images/profile_picture.jpg`} />
     
     <!-- Preload Critical Fonts (most used weights first) -->
-    <link rel="preload" href={`${base}/fonts/Montserrat/Montserrat-Regular.woff2`} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={`${base}/fonts/Montserrat/Montserrat-Bold.woff2`} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={`${base}/fonts/Quantico/Quantico-Bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${baseUrl}fonts/Montserrat/Montserrat-Regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${baseUrl}fonts/Montserrat/Montserrat-Bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${baseUrl}fonts/Quantico/Quantico-Bold.woff2`} as="font" type="font/woff2" crossorigin />
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#F5F2EB" />

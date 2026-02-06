@@ -4,7 +4,7 @@ A modern, animated portfolio website built with Astro, GSAP, and Tailwind CSS v4
 
 ## 🚀 Live Demo
 
-[https://syahrezaadnanalalzhar.github.io/syahreza_adnan_portfolio/](https://syahrezaadnanalalzhar.github.io/syahreza_adnan_portfolio/)
+[https://syahrezaadnanalazhar.github.io/](https://syahrezaadnanalazhar.github.io/)
 
 ## ✨ Features
 
@@ -21,7 +21,7 @@ A modern, animated portfolio website built with Astro, GSAP, and Tailwind CSS v4
 ## 📁 Project Structure
 
 ```
-syahreza_adnan_portfolio/
+syahrezaadnanalazhar.github.io/
 ├── public/
 │   └── images/
 │       ├── profile_picture.jpg
