@@ -1,6 +1,1 @@
-<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="400" fill="#1a1a1a"/>
-  <text x="200" y="180" font-family="Arial, sans-serif" font-size="24" fill="#FFE61F" text-anchor="middle" font-weight="bold">ORGANIZATION</text>
-  <text x="200" y="220" font-family="Arial, sans-serif" font-size="20" fill="#FF991C" text-anchor="middle">LOGO</text>
-  <text x="200" y="260" font-family="Arial, sans-serif" font-size="14" fill="#999" text-anchor="middle">Replace with real logo</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><path fill="#1a1a1a" d="M0 0h400v400H0z"/><text x="200" y="180" fill="#ffe61f" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle">ORGANIZATION</text><text x="200" y="220" fill="#ff991c" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">LOGO</text><text x="200" y="260" fill="#999" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Replace with real logo</text></svg>
