@@ -96,13 +96,31 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
 </script>
 
 <script>
-  // Scroll position preservation for back navigation
-  function initScrollPreservation() {
-    const basePath = import.meta.env.BASE_URL || '/';
-    const currentPath = window.location.pathname;
-    const isHomePage = currentPath === basePath || currentPath === basePath.replace(/\/$/, '') || currentPath === basePath + 'index.html';
+  // Extend Window interface
+  declare global {
+    interface Window {
+      __skipHeroAnimation?: boolean;
+      __restoreScrollY?: number;
+      __scrollSaveAttached?: boolean;
+    }
+  }
 
-    // Save scroll position when clicking internal links that navigate away from current page
+  // Take manual control of scroll restoration
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
+  function isCurrentPageHome(): boolean {
+    const basePath = import.meta.env.BASE_URL || '/';
+    const p = window.location.pathname;
+    return p === basePath || p === basePath.replace(/\/$/, '') || p === basePath + 'index.html';
+  }
+
+  // Save scroll position when clicking internal links
+  // Only attach once to avoid duplicate listeners
+  if (!window.__scrollSaveAttached) {
+    window.__scrollSaveAttached = true;
+
     document.addEventListener('click', (e) => {
       const link = (e.target as HTMLElement).closest('a');
       if (!link) return;
@@ -110,7 +128,6 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
       const href = link.getAttribute('href');
       if (!href) return;
 
-      // Only save for internal links (not hash-only, not external, not download)
       const isExternal = link.hostname !== window.location.hostname;
       const isHashOnly = href.startsWith('#');
       const isDownload = link.hasAttribute('download');
@@ -118,40 +135,51 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
 
       if (isExternal || isHashOnly || isDownload || isJavascript) return;
 
-      // Save the scroll position for the current page before navigating
-      sessionStorage.setItem('scrollPos_' + currentPath, window.scrollY.toString());
+      // Save scroll position for current page
+      sessionStorage.setItem('scrollPos_' + window.location.pathname, window.scrollY.toString());
     });
+  }
 
-    // On home page, check if this is a back navigation and restore scroll
-    if (isHomePage) {
-      const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-      const isBackNavigation = navEntries.length > 0 && navEntries[0].type === 'back_forward';
+  // Handle fresh page load back navigation (no bfcache)
+  function checkBackNavigationOnLoad() {
+    if (!isCurrentPageHome()) return;
 
-      if (isBackNavigation) {
-        const savedScroll = sessionStorage.getItem('scrollPos_' + currentPath);
-        if (savedScroll) {
-          const scrollY = parseInt(savedScroll, 10);
-          // Mark that we need to skip hero animations and restore scroll
-          window.__skipHeroAnimation = true;
-          window.__restoreScrollY = scrollY;
+    const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    const isBackNav = navEntries.length > 0 && navEntries[0].type === 'back_forward';
 
-          // Clean up
-          sessionStorage.removeItem('scrollPos_' + currentPath);
-        }
+    if (isBackNav) {
+      const saved = sessionStorage.getItem('scrollPos_' + window.location.pathname);
+      if (saved) {
+        const scrollY = parseInt(saved, 10);
+        window.__skipHeroAnimation = true;
+        window.__restoreScrollY = scrollY;
+        sessionStorage.removeItem('scrollPos_' + window.location.pathname);
       }
     }
   }
 
-  // Extend Window interface
-  declare global {
-    interface Window {
-      __skipHeroAnimation?: boolean;
-      __restoreScrollY?: number;
-    }
-  }
+  checkBackNavigationOnLoad();
 
-  initScrollPreservation();
-  document.addEventListener('astro:page-load', initScrollPreservation);
+  // Handle bfcache restore (browser restores page from memory)
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return; // Only handle bfcache restores
+    if (!isCurrentPageHome()) return;
+
+    const saved = sessionStorage.getItem('scrollPos_' + window.location.pathname);
+    if (saved) {
+      const scrollY = parseInt(saved, 10);
+      sessionStorage.removeItem('scrollPos_' + window.location.pathname);
+
+      // bfcache: DOM is already in final state (animations already ran before nav)
+      // Just restore scroll position instantly
+      const html = document.documentElement;
+      html.style.scrollBehavior = 'auto';
+      window.scrollTo(0, scrollY);
+      requestAnimationFrame(() => {
+        html.style.scrollBehavior = '';
+      });
+    }
+  });
 </script>
 
 <style is:global>

@@ -7,6 +7,7 @@ import TechStack from '../components/sections/TechStack.astro';
 import ProjectsOverview from '../components/sections/ProjectsOverview.astro';
 import AwardsOverview from '../components/sections/AwardsOverview.astro';
 import ContactSection from '../components/sections/ContactSection.astro';
+import ProjectModal from '../components/sections/ProjectModal.astro';
 ---
 
 <Layout 
@@ -35,4 +36,7 @@ import ContactSection from '../components/sections/ContactSection.astro';
     <!-- Contact Section -->
     <ContactSection />
   </main>
+
+  <!-- Project Detail Modal (rendered on home page) -->
+  <ProjectModal />
 </Layout>

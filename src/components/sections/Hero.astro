@@ -320,6 +320,13 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
 
     // Check if we should skip animations (back navigation with scroll restore)
     if (window.__skipHeroAnimation) {
+      const scrollY = window.__restoreScrollY || 0;
+      window.__skipHeroAnimation = false;
+      window.__restoreScrollY = undefined;
+
+      // Kill any existing GSAP animations/timelines on hero elements
+      gsap.killTweensOf('.hero-circle, .hero-profile-img, .hero-greeting, .hero-name, .hero-name-highlight, .hero-role, .hero-education, .hero-description, .hero-highlight-text, .hero-cta, .scroll-indicator');
+
       // Set all elements to their final state instantly
       gsap.set('.hero-circle', { transform: 'translateX(-50%) scale(1)' });
       gsap.set('.hero-profile-img', { clipPath: 'inset(0% 0 0 0)' });
@@ -333,19 +340,16 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
       gsap.set('.hero-cta', { autoAlpha: 1, y: 0 });
       gsap.set('.scroll-indicator', { autoAlpha: 1, y: 0 });
 
-      // Restore scroll position after a frame to ensure layout is ready
-      const scrollY = window.__restoreScrollY || 0;
-      window.__skipHeroAnimation = false;
-      window.__restoreScrollY = undefined;
-
-      // Temporarily disable smooth scroll for instant jump
+      // Restore scroll position — use double rAF to ensure layout is fully settled
       const html = document.documentElement;
       html.style.scrollBehavior = 'auto';
       requestAnimationFrame(() => {
-        window.scrollTo(0, scrollY);
-        // Re-enable smooth scroll after restoring
         requestAnimationFrame(() => {
-          html.style.scrollBehavior = '';
+          window.scrollTo(0, scrollY);
+          // Re-enable smooth scroll after a tick
+          requestAnimationFrame(() => {
+            html.style.scrollBehavior = '';
+          });
         });
       });
       return;

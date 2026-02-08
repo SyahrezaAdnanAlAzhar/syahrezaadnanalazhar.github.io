@@ -41,6 +41,11 @@ const colors = colorMap[project.data.projectType];
   title={`${project.data.title} | Syahreza Adnan`}
   description={project.data.description}
 >
+  <!-- Redirect to home page with modal when loaded directly in browser -->
+  <script is:inline define:vars={{ slug: project.slug, baseUrl }}>
+    window.location.replace(baseUrl + '#project/' + slug);
+  </script>
+
   <Navbar />
   
   <main class="project-detail-main">
