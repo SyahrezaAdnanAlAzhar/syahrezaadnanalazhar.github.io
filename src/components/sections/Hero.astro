@@ -318,6 +318,39 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
       el.textContent = greeting;
     });
 
+    // Check if we should skip animations (back navigation with scroll restore)
+    if (window.__skipHeroAnimation) {
+      // Set all elements to their final state instantly
+      gsap.set('.hero-circle', { transform: 'translateX(-50%) scale(1)' });
+      gsap.set('.hero-profile-img', { clipPath: 'inset(0% 0 0 0)' });
+      gsap.set('.hero-greeting', { autoAlpha: 1, y: 0 });
+      gsap.set('.hero-name', { autoAlpha: 1, y: 0 });
+      gsap.set('.hero-name-highlight', { backgroundSize: '100% 100%' });
+      gsap.set('.hero-role', { autoAlpha: 1, y: 0 });
+      gsap.set('.hero-education', { autoAlpha: 1, y: 0 });
+      gsap.set('.hero-description', { autoAlpha: 1, y: 0 });
+      gsap.set('.hero-highlight-text', { backgroundSize: '100% 100%' });
+      gsap.set('.hero-cta', { autoAlpha: 1, y: 0 });
+      gsap.set('.scroll-indicator', { autoAlpha: 1, y: 0 });
+
+      // Restore scroll position after a frame to ensure layout is ready
+      const scrollY = window.__restoreScrollY || 0;
+      window.__skipHeroAnimation = false;
+      window.__restoreScrollY = undefined;
+
+      // Temporarily disable smooth scroll for instant jump
+      const html = document.documentElement;
+      html.style.scrollBehavior = 'auto';
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollY);
+        // Re-enable smooth scroll after restoring
+        requestAnimationFrame(() => {
+          html.style.scrollBehavior = '';
+        });
+      });
+      return;
+    }
+
     const mm = gsap.matchMedia();
 
     // Common animation for all screen sizes

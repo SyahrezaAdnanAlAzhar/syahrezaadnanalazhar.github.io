@@ -376,6 +376,23 @@ const currentPath = Astro.url.pathname;
     let isMenuOpen = false;
     let currentActiveSection = '';
 
+    // Detect if we're on the home page
+    const basePath = import.meta.env.BASE_URL || '/';
+    const currentPath = window.location.pathname;
+    const isHomePage = currentPath === basePath || currentPath === basePath.replace(/\/$/, '') || currentPath === basePath + 'index.html';
+
+    // On non-home pages, show navbar immediately without scroll trigger
+    if (!isHomePage) {
+      isNavbarVisible = true;
+      navbar.classList.add('visible');
+      navbarProfile.classList.add('visible');
+      navbarProfile.style.opacity = '1';
+      navbarProfile.style.transform = 'scale(1)';
+      navbarName.classList.add('visible');
+      navbarName.style.opacity = '1';
+      navbarName.style.transform = 'translateX(0)';
+    }
+
     // Section IDs to observe
     const sectionIds = ['experience', 'tech-stack', 'projects', 'awards', 'contact'];
     const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
@@ -551,16 +568,30 @@ const currentPath = Astro.url.pathname;
       }
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    
-    // Initial check
-    updateNavbarVisibility();
-    checkHomeSection();
+    // Only attach scroll-based visibility on home page
+    if (isHomePage) {
+      window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Handle resize
-    window.addEventListener('resize', () => {
+      // Initial check
       updateNavbarVisibility();
-    });
+      checkHomeSection();
+
+      // Handle resize
+      window.addEventListener('resize', () => {
+        updateNavbarVisibility();
+      });
+    } else {
+      // On sub-pages, still track scroll for home section check (not needed but harmless)
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            checkHomeSection();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    }
   }
 
   // Initialize on page load
