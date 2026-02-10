@@ -341,7 +341,13 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
 
   gsap.registerPlugin(ScrollTrigger);
 
+  // --- Cleanup function for GSAP animations ---
+  let awardsAnimCleanup = () => {};
+  let awardsToggleInit = false;
+
   function initAwardsAnimations() {
+    awardsAnimCleanup();
+
     const initialCards = document.querySelectorAll('[data-initial-card]');
     if (!initialCards.length) return;
 
@@ -402,22 +408,29 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
         }
       );
     });
+
+    awardsAnimCleanup = () => {
+      mm.revert();
+    };
   }
 
-  function initToggleButton() {
-    const toggleBtn = document.getElementById('awards-toggle-btn');
-    const additionalCards = document.querySelectorAll('[data-additional-card]');
-    
-    if (!toggleBtn || !additionalCards.length) return;
+  // --- Event Delegation for toggle button (added ONCE, never re-added) ---
+  function initAwardsToggleDelegation() {
+    if (awardsToggleInit) return;
+    awardsToggleInit = true;
 
-    let isExpanded = false;
+    document.addEventListener('click', (e) => {
+      const toggleBtn = (e.target as HTMLElement).closest('#awards-toggle-btn');
+      if (!toggleBtn) return;
 
-    toggleBtn.addEventListener('click', () => {
+      const additionalCards = document.querySelectorAll('[data-additional-card]');
+      if (!additionalCards.length) return;
+
+      const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
       const toggleText = toggleBtn.querySelector('.toggle-text');
-      
+
       if (!isExpanded) {
         // Show More - expand cards
-        isExpanded = true;
         toggleBtn.setAttribute('aria-expanded', 'true');
         if (toggleText) toggleText.textContent = 'Show Less';
 
@@ -443,7 +456,6 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
         );
       } else {
         // Show Less - collapse cards
-        isExpanded = false;
         toggleBtn.setAttribute('aria-expanded', 'false');
         if (toggleText) toggleText.textContent = 'Show More';
 
@@ -470,15 +482,15 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       initAwardsAnimations();
-      initToggleButton();
+      initAwardsToggleDelegation();
     });
   } else {
     initAwardsAnimations();
-    initToggleButton();
+    initAwardsToggleDelegation();
   }
 
   document.addEventListener('astro:page-load', () => {
     initAwardsAnimations();
-    initToggleButton();
+    initAwardsToggleDelegation();
   });
 </script>

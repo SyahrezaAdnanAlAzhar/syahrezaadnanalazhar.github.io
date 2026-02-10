@@ -20,7 +20,12 @@ const { class: className = '' } = Astro.props;
 
   gsap.registerPlugin(ScrollTrigger);
 
+  let connectorCleanup = () => {};
+
   function initConnectorLines() {
+    connectorCleanup();
+
+    const tweens: gsap.core.Tween[] = [];
     const isMobile = window.innerWidth < 768;
     const connectorLines = document.querySelectorAll('[data-connector-line]');
 
@@ -30,7 +35,7 @@ const { class: className = '' } = Astro.props;
         gsap.set(line, { opacity: 1 });
       } else {
         // Desktop/Tablet: Light saber effect (0% → 100% on scroll)
-        gsap.fromTo(
+        const tween = gsap.fromTo(
           line,
           { opacity: 0 },
           {
@@ -45,8 +50,16 @@ const { class: className = '' } = Astro.props;
             },
           }
         );
+        tweens.push(tween);
       }
     });
+
+    connectorCleanup = () => {
+      tweens.forEach(t => {
+        t.scrollTrigger?.kill();
+        t.kill();
+      });
+    };
   }
 
   // Initialize on page load
@@ -60,7 +73,7 @@ const { class: className = '' } = Astro.props;
   document.addEventListener('astro:page-load', initConnectorLines);
 
   // Handle window resize
-  let resizeTimeout: NodeJS.Timeout;
+  let resizeTimeout: ReturnType<typeof setTimeout>;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {

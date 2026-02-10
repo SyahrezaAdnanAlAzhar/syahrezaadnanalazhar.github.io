@@ -56,7 +56,13 @@ const { id, defaultExpanded = false, class: className = '' } = Astro.props;
 </style>
 
 <script>
+  let expandableAbortController: AbortController | null = null;
+
   function initExpandableCards() {
+    if (expandableAbortController) expandableAbortController.abort();
+    expandableAbortController = new AbortController();
+    const { signal } = expandableAbortController;
+
     const cards = document.querySelectorAll('.expandable-card');
     
     cards.forEach(card => {
@@ -94,7 +100,7 @@ const { id, defaultExpanded = false, class: className = '' } = Astro.props;
       };
 
       // Click event
-      header.addEventListener('click', toggle);
+      header.addEventListener('click', toggle, { signal });
       
       // Keyboard support
       header.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -102,7 +108,7 @@ const { id, defaultExpanded = false, class: className = '' } = Astro.props;
           e.preventDefault();
           toggle();
         }
-      });
+      }, { signal });
 
       // Set initial state
       const defaultExpanded = header.getAttribute('aria-expanded') === 'true';

@@ -739,7 +739,7 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
 </style>
 
 <script>
-  import emailjs from '@emailjs/browser';
+  // @emailjs/browser is dynamically imported on form submit to avoid eager bundling
 
   // Extend Window for global Turnstile state & callbacks (set by inline script)
   declare global {
@@ -756,7 +756,12 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
     }
   }
 
+  let contactAbortController: AbortController | null = null;
+
   function initContactSection() {
+    if (contactAbortController) contactAbortController.abort();
+    contactAbortController = new AbortController();
+    const { signal } = contactAbortController;
 
     // Get EmailJS config
     const configEl = document.getElementById('emailjs-config');
@@ -766,10 +771,7 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
     const serviceId = configEl.getAttribute('data-service-id');
     const templateId = configEl.getAttribute('data-template-id');
 
-    // Initialize EmailJS
-    if (publicKey) {
-      emailjs.init(publicKey);
-    }
+    // EmailJS is initialized lazily on first form submit
 
     // Reconstruct and display email (anti-bot)
     const emailLink = document.querySelector('.email-link') as HTMLAnchorElement;
@@ -801,7 +803,7 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
         } catch (err) {
           console.error('Failed to copy:', err);
         }
-      });
+      }, { signal });
     }
 
     // Sync submit button state with current token (may already be set by inline script)
@@ -886,9 +888,13 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
         submitBtn.setAttribute('disabled', 'true');
 
         try {
-          if (!serviceId || !templateId) {
+          if (!serviceId || !templateId || !publicKey) {
             throw new Error('EmailJS configuration missing');
           }
+
+          // Dynamically import and initialize EmailJS only when needed
+          const emailjs = (await import('@emailjs/browser')).default;
+          emailjs.init(publicKey);
 
           // Send with Turnstile token included as a template parameter
           await emailjs.send(serviceId, templateId, {
@@ -922,7 +928,7 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
             submitBtn.setAttribute('disabled', 'true');
           }
         }
-      });
+      }, { signal });
     }
 
     function setError(fieldId: string, message: string) {

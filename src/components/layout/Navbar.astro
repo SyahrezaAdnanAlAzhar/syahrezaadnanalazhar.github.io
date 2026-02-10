@@ -360,7 +360,17 @@ const currentPath = Astro.url.pathname;
 
   gsap.registerPlugin(ScrollTrigger);
 
+  let navbarAbortController: AbortController | null = null;
+  let navbarSectionObserver: IntersectionObserver | null = null;
+
   function initDynamicNavbar() {
+    // Cleanup previous listeners and observers
+    if (navbarAbortController) navbarAbortController.abort();
+    if (navbarSectionObserver) navbarSectionObserver.disconnect();
+
+    navbarAbortController = new AbortController();
+    const { signal } = navbarAbortController;
+
     const navbar = document.getElementById('dynamic-navbar');
     const navbarProfile = document.getElementById('navbarProfile');
     const navbarName = document.getElementById('navbarName');
@@ -403,7 +413,7 @@ const currentPath = Astro.url.pathname;
       threshold: 0
     };
 
-    const sectionObserver = new IntersectionObserver((entries) => {
+    navbarSectionObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const sectionId = entry.target.id;
@@ -414,7 +424,7 @@ const currentPath = Astro.url.pathname;
 
     // Observe all sections
     sections.forEach(section => {
-      sectionObserver.observe(section);
+      navbarSectionObserver!.observe(section);
     });
 
     // Function to update active nav link
@@ -473,7 +483,7 @@ const currentPath = Astro.url.pathname;
         mobileMenu.classList.toggle('open', isMenuOpen);
         navbarContainer?.classList.toggle('menu-expanded', isMenuOpen);
         hamburgerBtn.setAttribute('aria-expanded', isMenuOpen.toString());
-      });
+      }, { signal });
 
       // Close menu when clicking a link
       mobileMenu.querySelectorAll('a').forEach(link => {
@@ -483,7 +493,7 @@ const currentPath = Astro.url.pathname;
           mobileMenu.classList.remove('open');
           navbarContainer?.classList.remove('menu-expanded');
           hamburgerBtn.setAttribute('aria-expanded', 'false');
-        });
+        }, { signal });
       });
     }
 
@@ -569,7 +579,7 @@ const currentPath = Astro.url.pathname;
 
     // Only attach scroll-based visibility on home page
     if (isHomePage) {
-      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('scroll', onScroll, { passive: true, signal });
 
       // Initial check
       updateNavbarVisibility();
@@ -578,7 +588,7 @@ const currentPath = Astro.url.pathname;
       // Handle resize
       window.addEventListener('resize', () => {
         updateNavbarVisibility();
-      });
+      }, { signal });
     } else {
       // On sub-pages, still track scroll for home section check (not needed but harmless)
       window.addEventListener('scroll', () => {
@@ -589,7 +599,7 @@ const currentPath = Astro.url.pathname;
           });
           ticking = true;
         }
-      }, { passive: true });
+      }, { passive: true, signal });
     }
   }
 

@@ -320,108 +320,143 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
 </style>
 
 <script>
-  function initCardHoverEffect() {
-    const cards = document.querySelectorAll('[data-hover-card]');
-    
-    cards.forEach(cardEl => {
-      const card = cardEl as HTMLElement;
+  // ---- Event-delegated hover effect for ExperienceCards ----
+  // Per-card state stored in a WeakMap; delegated listeners added once.
+
+  interface CardHoverState {
+    animationId: number | null;
+    currentSize: number;
+    targetSize: number;
+    gradientX: number;
+    gradientY: number;
+    isHovering: boolean;
+    overlay: HTMLElement;
+  }
+
+  const cardStateMap = new WeakMap<HTMLElement, CardHoverState>();
+
+  function getOrCreateCardState(card: HTMLElement): CardHoverState | null {
+    let state = cardStateMap.get(card);
+    if (!state) {
       const overlay = card.querySelector('.card-gradient-overlay') as HTMLElement;
-      if (!overlay) return;
+      if (!overlay) return null;
+      state = {
+        animationId: null,
+        currentSize: 0,
+        targetSize: 0,
+        gradientX: 0,
+        gradientY: 0,
+        isHovering: false,
+        overlay,
+      };
+      cardStateMap.set(card, state);
+    }
+    return state;
+  }
 
-      let animationId: number | null = null;
-      let currentSize = 0;
-      let targetSize = 0;
-      let gradientX = 0;
-      let gradientY = 0;
-      let isHovering = false;
+  function getCardMaxSize(card: HTMLElement): number {
+    const rect = card.getBoundingClientRect();
+    return Math.sqrt(rect.width * rect.width + rect.height * rect.height) * 1.5;
+  }
 
-      // Calculate max size needed to cover entire card from any point
-      function getMaxSize(): number {
-        const rect = card.getBoundingClientRect();
-        // Diagonal of the card ensures full coverage from any corner
-        return Math.sqrt(rect.width * rect.width + rect.height * rect.height) * 1.5;
+  function animateCardGradient(card: HTMLElement) {
+    const state = cardStateMap.get(card);
+    if (!state) return;
+    const speed = 0.08;
+    const diff = state.targetSize - state.currentSize;
+
+    if (Math.abs(diff) > 1) {
+      state.currentSize += diff * speed;
+      updateCardOverlay(state);
+      state.animationId = requestAnimationFrame(() => animateCardGradient(card));
+    } else {
+      state.currentSize = state.targetSize;
+      updateCardOverlay(state);
+      state.animationId = null;
+
+      if (state.currentSize <= 0) {
+        state.overlay.style.background = 'transparent';
       }
+    }
+  }
 
-      // Animate the gradient expansion/contraction
-      function animateGradient() {
-        const speed = 0.08; // Adjust for faster/slower animation
-        const diff = targetSize - currentSize;
-        
-        if (Math.abs(diff) > 1) {
-          currentSize += diff * speed;
-          updateOverlay();
-          animationId = requestAnimationFrame(animateGradient);
-        } else {
-          currentSize = targetSize;
-          updateOverlay();
-          animationId = null;
-          
-          // If fully contracted, hide the gradient
-          if (currentSize <= 0) {
-            overlay.style.background = 'transparent';
-          }
-        }
+  function updateCardOverlay(state: CardHoverState) {
+    if (state.currentSize > 0) {
+      state.overlay.style.background =
+        `radial-gradient(circle ${state.currentSize}px at ${state.gradientX}px ${state.gradientY}px, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 70%, rgba(255, 255, 255, 0) 100%)`;
+    }
+  }
+
+  function cardStartExpand(card: HTMLElement, x: number, y: number) {
+    const state = getOrCreateCardState(card);
+    if (!state) return;
+    const rect = card.getBoundingClientRect();
+    state.gradientX = x - rect.left;
+    state.gradientY = y - rect.top;
+    state.targetSize = getCardMaxSize(card);
+    state.isHovering = true;
+    if (!state.animationId) {
+      state.animationId = requestAnimationFrame(() => animateCardGradient(card));
+    }
+  }
+
+  function cardStartContract(card: HTMLElement) {
+    const state = cardStateMap.get(card);
+    if (!state) return;
+    state.targetSize = 0;
+    state.isHovering = false;
+    if (!state.animationId) {
+      state.animationId = requestAnimationFrame(() => animateCardGradient(card));
+    }
+  }
+
+  // --- Delegated listeners: added ONCE, never re-added ---
+  let hoverDelegationInit = false;
+
+  function initCardHoverDelegation() {
+    if (hoverDelegationInit) return;
+    hoverDelegationInit = true;
+
+    let currentHoveredCard: HTMLElement | null = null;
+
+    // mouseover/mouseout bubble, so event delegation works
+    document.addEventListener('mouseover', (e) => {
+      const card = (e.target as HTMLElement).closest('[data-hover-card]') as HTMLElement | null;
+      if (card && card !== currentHoveredCard) {
+        currentHoveredCard = card;
+        cardStartExpand(card, e.clientX, e.clientY);
       }
-
-      function updateOverlay() {
-        if (currentSize > 0) {
-          overlay.style.background = `radial-gradient(circle ${currentSize}px at ${gradientX}px ${gradientY}px, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 70%, rgba(255, 255, 255, 0) 100%)`;
-        }
-      }
-
-      function startExpand(x: number, y: number) {
-        const rect = card.getBoundingClientRect();
-        gradientX = x - rect.left;
-        gradientY = y - rect.top;
-        targetSize = getMaxSize();
-        isHovering = true;
-        
-        if (!animationId) {
-          animationId = requestAnimationFrame(animateGradient);
-        }
-      }
-
-      function startContract() {
-        targetSize = 0;
-        isHovering = false;
-        
-        if (!animationId) {
-          animationId = requestAnimationFrame(animateGradient);
-        }
-      }
-
-      // Mouse events
-      card.addEventListener('mouseenter', (e: MouseEvent) => {
-        startExpand(e.clientX, e.clientY);
-      });
-
-      card.addEventListener('mouseleave', () => {
-        startContract();
-      });
-
-      // Touch events
-      card.addEventListener('touchstart', (e: TouchEvent) => {
-        const touch = e.touches[0];
-        startExpand(touch.clientX, touch.clientY);
-      }, { passive: true });
-
-      card.addEventListener('touchend', () => {
-        startContract();
-      }, { passive: true });
-
-      card.addEventListener('touchcancel', () => {
-        startContract();
-      }, { passive: true });
     });
+
+    document.addEventListener('mouseout', (e) => {
+      if (!currentHoveredCard) return;
+      const related = (e as MouseEvent).relatedTarget as HTMLElement | null;
+      if (!related || !currentHoveredCard.contains(related)) {
+        cardStartContract(currentHoveredCard);
+        currentHoveredCard = null;
+      }
+    });
+
+    // Touch events bubble by default
+    document.addEventListener('touchstart', (e) => {
+      const card = (e.target as HTMLElement).closest('[data-hover-card]') as HTMLElement | null;
+      if (!card) return;
+      const touch = e.touches[0];
+      cardStartExpand(card, touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      const card = (e.target as HTMLElement).closest('[data-hover-card]') as HTMLElement | null;
+      if (card) cardStartContract(card);
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', (e) => {
+      const card = (e.target as HTMLElement).closest('[data-hover-card]') as HTMLElement | null;
+      if (card) cardStartContract(card);
+    }, { passive: true });
   }
 
-  // Initialize on page load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCardHoverEffect);
-  } else {
-    initCardHoverEffect();
-  }
-
-  // Re-initialize on Astro navigation
-  document.addEventListener('astro:page-load', initCardHoverEffect);
+  // Initialize delegation once (guard prevents stacking)
+  initCardHoverDelegation();
+  document.addEventListener('astro:page-load', initCardHoverDelegation);
 </script>
