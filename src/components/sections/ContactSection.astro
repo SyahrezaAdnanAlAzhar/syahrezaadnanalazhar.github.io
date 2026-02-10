@@ -1,6 +1,6 @@
 ---
 import SectionHeading from '../ui/SectionHeading.astro';
-import { EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID } from '../../constants/emailjs';
+import { EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, TURNSTILE_SITE_KEY } from '../../constants/emailjs';
 
 // Get base URL for image paths
 const base = import.meta.env.BASE_URL;
@@ -176,7 +176,20 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
             <span class="error-message"></span>
           </div>
 
-          <button type="submit" class="submit-btn" id="submit-btn">
+          <!-- Cloudflare Turnstile CAPTCHA Widget -->
+          <div class="turnstile-wrapper">
+            <div
+              class="cf-turnstile"
+              data-sitekey={TURNSTILE_SITE_KEY}
+              data-callback="onTurnstileSuccess"
+              data-expired-callback="onTurnstileExpired"
+              data-error-callback="onTurnstileError"
+              data-theme="light"
+            ></div>
+            <span class="turnstile-error" id="turnstile-error"></span>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn" disabled>
             <span class="material-icons-round">send</span>
             <span class="btn-text">Send Message</span>
             <span class="loading-spinner"></span>
@@ -662,6 +675,24 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
     font-size: 0.95rem;
   }
 
+  /* Turnstile Widget */
+  .turnstile-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .turnstile-error {
+    font-size: 0.75rem;
+    color: rgb(254, 202, 202);
+    min-height: 1rem;
+    display: none;
+  }
+
+  .turnstile-error.show {
+    display: block;
+  }
+
   /* Mobile Adjustments */
   @media (max-width: 639px) {
     .contact-container {
@@ -675,13 +706,69 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
     .submit-btn {
       width: 100%;
     }
+
+    .turnstile-wrapper {
+      overflow-x: auto;
+    }
   }
 </style>
 
 <script>
   import emailjs from '@emailjs/browser';
 
+  // --- Turnstile Token State ---
+  let turnstileToken: string | null = null;
+
+  // Extend Window for global Turnstile callbacks
+  declare global {
+    interface Window {
+      onTurnstileSuccess: (token: string) => void;
+      onTurnstileExpired: () => void;
+      onTurnstileError: () => void;
+      turnstile?: {
+        reset: (widgetIdOrContainer?: string | HTMLElement) => void;
+        render: (container: string | HTMLElement, options: Record<string, unknown>) => string;
+      };
+    }
+  }
+
+  // --- Global Turnstile Callbacks (must be on window for the widget) ---
+  window.onTurnstileSuccess = (token: string) => {
+    turnstileToken = token;
+    // Hide Turnstile error
+    const errorEl = document.getElementById('turnstile-error');
+    if (errorEl) {
+      errorEl.textContent = '';
+      errorEl.classList.remove('show');
+    }
+    // Enable submit button
+    updateSubmitButtonState();
+  };
+
+  window.onTurnstileExpired = () => {
+    turnstileToken = null;
+    updateSubmitButtonState();
+  };
+
+  window.onTurnstileError = () => {
+    turnstileToken = null;
+    updateSubmitButtonState();
+  };
+
+  function updateSubmitButtonState() {
+    const submitBtn = document.getElementById('submit-btn');
+    if (!submitBtn) return;
+    if (turnstileToken) {
+      submitBtn.removeAttribute('disabled');
+    } else {
+      submitBtn.setAttribute('disabled', 'true');
+    }
+  }
+
   function initContactSection() {
+    // Reset token state on re-init (e.g. Astro page navigation)
+    turnstileToken = null;
+
     // Get EmailJS config
     const configEl = document.getElementById('emailjs-config');
     if (!configEl) return;
@@ -728,6 +815,9 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
       });
     }
 
+    // Ensure submit button starts disabled
+    updateSubmitButtonState();
+
     // Form handling
     const form = document.getElementById('contact-form') as HTMLFormElement;
     const submitBtn = document.getElementById('submit-btn');
@@ -742,6 +832,21 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
           const errorEl = group.querySelector('.error-message');
           if (errorEl) errorEl.textContent = '';
         });
+
+        // --- Turnstile Token Check (hard block) ---
+        const turnstileErrorEl = document.getElementById('turnstile-error');
+        if (!turnstileToken) {
+          if (turnstileErrorEl) {
+            turnstileErrorEl.textContent = 'Please complete the CAPTCHA verification.';
+            turnstileErrorEl.classList.add('show');
+          }
+          return; // Hard block — do NOT proceed to EmailJS
+        }
+        // Clear turnstile error if token present
+        if (turnstileErrorEl) {
+          turnstileErrorEl.textContent = '';
+          turnstileErrorEl.classList.remove('show');
+        }
 
         // Validate form
         let isValid = true;
@@ -787,16 +892,32 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
             throw new Error('EmailJS configuration missing');
           }
 
-          await emailjs.sendForm(serviceId, templateId, form);
+          // Send with Turnstile token included as a template parameter
+          await emailjs.send(serviceId, templateId, {
+            name: name.trim(),
+            from_email: email.trim(),
+            subject: subject.trim(),
+            message: message.trim(),
+            turnstile_token: turnstileToken,
+          });
           
           showToast('success', 'Message sent successfully! I\'ll get back to you soon.');
           form.reset();
+
+          // Clear token after successful submission (single-use)
+          turnstileToken = null;
+
+          // Reset the Turnstile widget for the next submission
+          const turnstileWidget = form.querySelector('.cf-turnstile') as HTMLElement;
+          if (window.turnstile && turnstileWidget) {
+            window.turnstile.reset(turnstileWidget);
+          }
         } catch (error) {
           console.error('EmailJS error:', error);
           showToast('error', 'Failed to send message. Please try again or email me directly.');
         } finally {
           submitBtn.classList.remove('loading');
-          submitBtn.removeAttribute('disabled');
+          updateSubmitButtonState();
         }
       });
     }
