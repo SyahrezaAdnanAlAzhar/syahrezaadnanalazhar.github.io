@@ -1,0 +1,155 @@
+---
+interface Props {
+  logo: string;
+  title: string;
+  organizer: string;
+  metaItems?: string[];
+}
+
+const { logo, title, organizer, metaItems = [] } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const logoSrc = logo.startsWith('/') && !logo.startsWith(base) ? `${base}${logo}` : logo;
+---
+
+<div class="award-meta">
+  <!-- Header Row: Logo + Title/Organizer -->
+  <div class="award-meta-header">
+    <div class="award-meta-logo">
+      <img src={logoSrc} alt={organizer} loading="eager" />
+    </div>
+    <div class="award-meta-info">
+      <h1 class="award-meta-title">{title}</h1>
+      <p class="award-meta-organizer">{organizer}</p>
+    </div>
+  </div>
+
+  <!-- Meta Items List -->
+  {metaItems.length > 0 && (
+    <ul class="award-meta-list">
+      {metaItems.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+  )}
+</div>
+
+<style>
+  .award-meta {
+    margin-bottom: 1.5rem;
+  }
+
+  .award-meta-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .award-meta-logo {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .award-meta-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 0.5rem;
+  }
+
+  .award-meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .award-meta-title {
+    font-family: 'Quantico', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #000000;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .award-meta-organizer {
+    font-size: 1rem;
+    color: #4b5563;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .award-meta-list {
+    list-style-type: disc;
+    margin: 1.25rem 0 0 0;
+    padding-left: 1.75rem;
+    color: #1f2937;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .award-meta-list li {
+    margin-bottom: 0.375rem;
+  }
+
+  .award-meta-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 639px) {
+    .award-meta-header {
+      gap: 1rem;
+    }
+
+    .award-meta-logo {
+      width: 56px;
+      height: 56px;
+    }
+
+    .award-meta-title {
+      font-size: 1.25rem;
+    }
+
+    .award-meta-organizer {
+      font-size: 0.875rem;
+    }
+
+    .award-meta-list {
+      font-size: 0.9375rem;
+      margin-top: 1rem;
+      padding-left: 1.5rem;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .award-meta-logo {
+      width: 80px;
+      height: 80px;
+    }
+
+    .award-meta-title {
+      font-size: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .award-meta-logo {
+      width: 88px;
+      height: 88px;
+    }
+
+    .award-meta-title {
+      font-size: 2.25rem;
+    }
+
+    .award-meta-list {
+      font-size: 1.0625rem;
+    }
+  }
+</style>

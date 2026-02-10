@@ -51,6 +51,9 @@ const awardsCollection = defineCollection({
         date: z.string(), // Format: "Month YYYY"
         image: z.string(), // Organizer logo path (e.g., "images/awards/award-slug/logo.png")
         order: z.number(), // Lower number = more recent
+        // Optional fields for detail modal (MDX content)
+        logo: z.string().optional(), // Logo path for AwardMeta header (defaults to image if not set)
+        description: z.string().optional(), // Brief description shown in modal
     }),
 });
 

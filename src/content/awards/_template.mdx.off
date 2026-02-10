@@ -1,0 +1,141 @@
+---
+title: "Award Title Here"
+organizer: "Organizer Name"
+date: "2025"
+image: "images/awards/award-slug/logo.svg"
+order: 1
+logo: "images/awards/award-slug/logo.svg"
+description: "Brief description of the award for meta/SEO purposes."
+---
+
+import AwardMeta from "@/components/content/AwardMeta.astro";
+import Section from "@/components/content/Section.astro";
+import P from "@/components/content/P.astro";
+import B from "@/components/content/B.astro";
+import Mark from "@/components/content/Mark.astro";
+import ImageGrid from "@/components/content/ImageGrid.astro";
+import Img from "@/components/content/Img.astro";
+import Table from "@/components/content/Table.astro";
+import Callout from "@/components/content/Callout.astro";
+import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
+
+{/* ========================================================================= */}
+{/* SECTION 1 — Header (AwardMeta, no Section wrapper)                        */}
+{/* ========================================================================= */}
+
+<AwardMeta
+  logo="images/awards/award-slug/logo.svg"
+  title="Award Title Here"
+  organizer="Organizer Name"
+  metaItems={[
+    "Key stat or context item",
+    "Role: Your Role",
+    "Duration: Month - Month Year",
+    "Output: What was produced"
+  ]}
+/>
+
+{/* ========================================================================= */}
+{/* SECTION 2 — Problem Context                                               */}
+{/* ========================================================================= */}
+
+<Section title="Problem Context" defaultOpen={true}>
+  <P>
+    Describe the problem or context that led to this achievement. What gap or challenge did your work address?
+  </P>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 3 — Responsibilities                                              */}
+{/* ========================================================================= */}
+
+<Section title="Responsibilities" defaultOpen={true}>
+  <P><B>Your Name (Your Role)</B></P>
+  <ul class="custom-list">
+    <li>Responsibility 1</li>
+    <li>Responsibility 2</li>
+    <li>Responsibility 3</li>
+  </ul>
+  <P><B>Team Member Name</B> — Their Role</P>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 4 — Technical Architecture (optional)                             */}
+{/* ========================================================================= */}
+
+<Section title="Technical Architecture" defaultOpen={false}>
+  <P>
+    Describe the technical approach, system design, or methodology used.
+  </P>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 5 — Key Technical Decisions (optional)                            */}
+{/* ========================================================================= */}
+
+<Section title="Key Technical Decisions" defaultOpen={false}>
+  <ul class="custom-list">
+    <li>Decision 1 and rationale</li>
+    <li>Decision 2 and rationale</li>
+  </ul>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 6 — Results & Validation                                          */}
+{/* ========================================================================= */}
+
+<Section title="Results & Validation" defaultOpen={false}>
+  <P><B>Quantitative Results</B></P>
+  <ul class="custom-list">
+    <li>Metric 1: Value</li>
+    <li>Metric 2: Value</li>
+  </ul>
+  <P><B>Qualitative Results</B></P>
+  <ul class="custom-list">
+    <li>Outcome 1</li>
+    <li>Outcome 2</li>
+  </ul>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 7 — Evidence                                                      */}
+{/* ========================================================================= */}
+
+<Section title="Evidence" defaultOpen={false}>
+  {/* Image Grid — use cols={2} or cols={3} */}
+  <ImageGrid cols={2}>
+    <Img src="images/awards/award-slug/evidence-1.png" caption="Caption 1" />
+    <Img src="images/awards/award-slug/evidence-2.png" caption="Caption 2" />
+  </ImageGrid>
+
+  {/* Social Media Card — clickable link card */}
+  <SocialMediaCard
+    href="https://www.instagram.com/p/example"
+    thumbnail="images/awards/award-slug/social-thumb.png"
+    platform="Instagram"
+    icon="images/contacts/instagram.svg"
+    caption="Post description"
+  />
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 8 — Impact & Outcomes                                             */}
+{/* ========================================================================= */}
+
+<Section title="Impact & Outcomes" defaultOpen={false}>
+  <ul class="custom-list">
+    <li>Impact item 1</li>
+    <li>Impact item 2</li>
+    <li>Impact item 3</li>
+  </ul>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 9 — Reflection                                                    */}
+{/* ========================================================================= */}
+
+<Section title="Reflection" defaultOpen={false}>
+  <P>
+    What did you learn? What would you do differently? What are the limitations?
+  </P>
+</Section>

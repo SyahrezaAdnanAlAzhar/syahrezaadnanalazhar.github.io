@@ -1,0 +1,182 @@
+---
+title: "PKM-KC 2025 - National Funding Award"
+organizer: "Ministry of Higher Education, Science and Technology Indonesia"
+date: "2025"
+image: "images/awards/2-pkm-kc-2025-national-funding-award/logo.svg"
+order: 2
+---
+
+import AwardMeta from "@/components/content/AwardMeta.astro";
+import Section from "@/components/content/Section.astro";
+import P from "@/components/content/P.astro";
+import B from "@/components/content/B.astro";
+import ImageGrid from "@/components/content/ImageGrid.astro";
+import Img from "@/components/content/Img.astro";
+import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
+
+{/* ========================================================================= */}
+{/* SECTION 1 — Header (AwardMeta, no Section wrapper) */}
+{/* ========================================================================= */}
+
+<AwardMeta
+  logo="images/awards/2-pkm-kc-2025-national-funding-award/logo.svg"
+  title="PKM-KC 2025 - National Funding Award"
+  organizer="Ministry of Higher Education, Science and Technology, Indonesia"
+  metaItems={[
+    "Funded proposal: 1,590 / 33,039 (≈4.8%)",
+    "Role: Team Leader & Technical Lead",
+    "Duration: Jul - Oct 2025",
+    "Output: Mobile AI Application (TumbuhSehat)",
+  ]}
+/>
+
+{/* ========================================================================= */}
+{/* SECTION 2 — Problem Context */}
+{/* ========================================================================= */}
+
+<Section title="Problem Context" defaultOpen={true}>
+  <P>
+    Nutritional monitoring in Indonesia still relies on manual 24-hour dietary
+    recall, which is prone to recall bias, inaccurate portion estimation, and
+    subjectivity. This limitation directly impacts early detection of stunting
+    and malnutrition, especially in community-based healthcare settings such as
+    posyandu.
+  </P>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 3 — Responsibilities */}
+{/* ========================================================================= */}
+
+<Section title="Responsibilities" defaultOpen={true}>
+  <P>
+    <B>Syahreza Adnan Al Azhar (Team Lead)</B>
+  </P>
+  <ul class="custom-list">
+    <li>
+      Led a cross-functional team to design and deliver an AI-powered nutrition
+      monitoring application
+    </li>
+    <li>
+      Authored and defended the national-level funded proposal and final report
+    </li>
+    <li>
+      Designed and implemented the mobile application (Flutter, BLoC
+      architecture)
+    </li>
+    <li>Developed the food semantic segmentation pipeline (DeepLabV3)</li>
+    <li>
+      Integrated monocular depth estimation (MiDaS) for food volume estimation
+    </li>
+    <li>
+      Designed end-to-end AI → nutrition analysis pipeline aligned with Kemenkes
+      & WHO standards
+    </li>
+  </ul>
+  <P>
+    <B>Puri Lalita Anagata</B> — UI/UX
+  </P>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 4 — Technical Architecture */}
+{/* ========================================================================= */}
+
+<Section title="Technical Architecture" defaultOpen={false}>
+  <P>
+    The system combines semantic segmentation and monocular depth estimation to
+    estimate food volume from a single top-down image. Segmentation masks are
+    fused with calibrated depth maps to compute food volume, which is then
+    mapped to nutritional values using TKPI, AKG, and WHO Child Growth
+    Standards.
+  </P>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 5 — Key Technical Decisions */}
+{/* ========================================================================= */}
+
+<Section title="Key Technical Decisions" defaultOpen={true}>
+  <ul class="custom-list">
+    <li>Chose DeepLabV3 for stable boundary segmentation on food textures</li>
+    <li>Used MiDaS v3.1 to avoid hardware dependency (no depth sensor)</li>
+    <li>
+      Applied plate-diameter calibration (25 cm) to convert relative depth into
+      metric volume
+    </li>
+    <li>
+      Designed system to work offline-first for low-connectivity environments
+    </li>
+  </ul>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 6 — Results & Validation */}
+{/* ========================================================================= */}
+
+<Section title="Results & Validation" defaultOpen={false}>
+  <P>
+    <B>Model Performance</B>
+  </P>
+  <ul class="custom-list">
+    <li>Segmentation mIoU: 95%</li>
+    <li>Depth estimation MRE: 4%, AbsRel: 6%</li>
+  </ul>
+  <P>
+    <B>User Validation</B>
+  </P>
+  <ul class="custom-list">
+    <li>SUS Score: 85.49 (Excellent)</li>
+    <li>Tested in real posyandu environments</li>
+    <li>Validated by certified nutritionist</li>
+  </ul>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 7 — Evidence */}
+{/* ========================================================================= */}
+
+<Section title="Evidence" defaultOpen={false}>
+  <ImageGrid cols={2}>
+    <Img src="images/awards/2-pkm-kc-2025-national-funding-award/logo.svg" caption="Award Certificate" />
+    <Img src="images/awards/2-pkm-kc-2025-national-funding-award/logo.svg" caption="Team Photo" />
+  </ImageGrid>
+
+{/* Social Media Evidence */}
+
+  <SocialMediaCard
+    href="https://www.instagram.com/p/example"
+    thumbnail="images/awards/2-pkm-kc-2025-national-funding-award/logo.svg"
+    platform="Instagram"
+    icon="images/contacts/instagram.svg"
+    caption="Publication Announcement"
+  />
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 8 — Impact & Outcomes */}
+{/* ========================================================================= */}
+
+<Section title="Impact & Outcomes" defaultOpen={true}>
+  <ul class="custom-list">
+    <li>Fully functional mobile application (Android & iOS)</li>
+    <li>Registered Intellectual Property (HKI)</li>
+    <li>
+      Scientific article prepared (IEEE format, planned Scopus Q3 submission)
+    </li>
+    <li>Potential continuation to PKM-KI & public health deployment</li>
+  </ul>
+</Section>
+
+{/* ========================================================================= */}
+{/* SECTION 9 — Reflection */}
+{/* ========================================================================= */}
+
+<Section title="Reflection" defaultOpen={false}>
+  <P>
+    The main technical limitation lies in handling mixed and translucent food
+    textures under uneven lighting. If revisited, I would explore lightweight
+    attention mechanisms and larger-scale dataset expansion to improve
+    generalization across food categories.
+  </P>
+</Section>

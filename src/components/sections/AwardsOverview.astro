@@ -30,6 +30,7 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
           href={`${base}awards/${award.slug}`}
           class="award-card"
           data-initial-card
+          data-award-slug={award.slug}
         >
           <!-- Organizer Logo -->
           <div class="award-logo-container">
@@ -47,6 +48,11 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
             <p class="award-organizer">{award.data.organizer}</p>
             <p class="award-date">{award.data.date}</p>
           </div>
+
+          <!-- Hover Overlay -->
+          <div class="award-overlay">
+            <span class="award-see-detail-badge">See Detail</span>
+          </div>
         </a>
       ))}
       
@@ -56,6 +62,7 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
           href={`${base}awards/${award.slug}`}
           class="award-card award-card-hidden"
           data-additional-card
+          data-award-slug={award.slug}
           style="display: none;"
         >
           <!-- Organizer Logo -->
@@ -73,6 +80,11 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
             <h3 class="award-title">{award.data.title}</h3>
             <p class="award-organizer">{award.data.organizer}</p>
             <p class="award-date">{award.data.date}</p>
+          </div>
+
+          <!-- Hover Overlay -->
+          <div class="award-overlay">
+            <span class="award-see-detail-badge">See Detail</span>
           </div>
         </a>
       ))}
@@ -140,6 +152,7 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
   }
 
   .award-card {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: stretch;
@@ -155,6 +168,36 @@ const additionalAwards = allAwards.slice(3); // Remaining awards
   .award-card:hover {
     transform: translateY(-8px) !important;
     box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  }
+
+  /* Hover Overlay */
+  .award-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: calc(1rem - 2px);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .award-card:hover .award-overlay {
+    opacity: 1;
+  }
+
+  .award-see-detail-badge {
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    background-color: #f97316;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 600;
   }
 
   .award-logo-container {
