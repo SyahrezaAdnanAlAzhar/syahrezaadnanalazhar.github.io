@@ -1,6 +1,7 @@
 ---
-// WebGLTopoBackground - Animated topographic contour lines using Three.js
+// WebGLTopoBackground - Animated topographic contour lines using raw WebGL
 // Uses simplex noise to generate infinite flowing contour lines
+// Zero external dependencies — fullscreen shader quad rendered directly via WebGLRenderingContext
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -55,17 +56,65 @@ const base = import.meta.env.BASE_URL;
 </style>
 
 <script>
-  // Lazy-load Three.js for better initial page load performance
-  // Three.js (~476KB) will load after the page becomes interactive
-  
-  // Shader code (these are just strings, no cost to define upfront)
+  // ─── Raw WebGL helpers ────────────────────────────────────────────────
+
+  /** Compile a single shader; returns null on failure. */
+  function compileShader(
+    gl: WebGLRenderingContext,
+    type: number,
+    source: string,
+  ): WebGLShader | null {
+    const shader = gl.createShader(type);
+    if (!shader) return null;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+      gl.deleteShader(shader);
+      return null;
+    }
+    return shader;
+  }
+
+  /** Link a vertex + fragment shader into a program; returns null on failure. */
+  function linkProgram(
+    gl: WebGLRenderingContext,
+    vertSrc: string,
+    fragSrc: string,
+  ): WebGLProgram | null {
+    const vs = compileShader(gl, gl.VERTEX_SHADER, vertSrc);
+    const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragSrc);
+    if (!vs || !fs) return null;
+
+    const program = gl.createProgram();
+    if (!program) return null;
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+
+    // Shaders can be freed after linking
+    gl.deleteShader(vs);
+    gl.deleteShader(fs);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error('Program link error:', gl.getProgramInfoLog(program));
+      gl.deleteProgram(program);
+      return null;
+    }
+    return program;
+  }
+
+  // ─── Shader sources ───────────────────────────────────────────────────
+
+  // Vertex shader — pass-through for a clip-space fullscreen quad
   const vertexShader = `
+    attribute vec2 a_position;
     void main() {
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      gl_Position = vec4(a_position, 0.0, 1.0);
     }
   `;
 
-  // Simplex noise function
+  // Simplex noise function (runs entirely on GPU)
   const simplexNoise = `
     vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
     vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -135,28 +184,31 @@ const base = import.meta.env.BASE_URL;
     }
   `;
 
-  // Fragment shader - creates contour lines
+  // Fragment shader — creates contour lines from simplex noise
   const fragmentShader = `
+    precision mediump float;
+
     uniform vec3 color;
     uniform float time;
     uniform vec2 resolution;
 
-    void main() {
-      float levels = 7.0; // Fewer contour lines (was 7, reduced for cleaner look)
+    ${simplexNoise}
 
-      // Scale coordinates - smaller value = larger, more spaced contours
+    void main() {
+      float levels = 7.0;
+
+      // Scale coordinates — smaller value = larger, more spaced contours
       vec2 uv = gl_FragCoord.xy * 0.001;
       float noise = snoise(vec3(uv, time * 0.012));
-      
+
       // Normalize noise from [-1, 1] to [0, 1]
       noise = (noise + 1.0) / 2.0;
 
-      // Posterize - find which band we're in
+      // Posterize — find which band we're in
       float lower = floor(noise * levels) / levels;
       float lowerDiff = noise - lower;
 
       // Only draw if we're at the edge of a band (creates contour lines)
-      // Smaller threshold = thinner lines (was 0.005, now 0.003)
       if (lowerDiff > 0.002)
         discard;
 
@@ -164,26 +216,21 @@ const base = import.meta.env.BASE_URL;
     }
   `;
 
-  async function initWebGLTopo() {
+  // ─── Initialisation ───────────────────────────────────────────────────
+
+  function initWebGLTopo() {
     const canvas = document.getElementById('topo-canvas') as HTMLCanvasElement;
     const fallback = document.getElementById('topo-fallback');
-    
     if (!canvas) return;
 
-    // Dynamically import Three.js for lazy loading
-    const THREE = await import('three');
+    // Acquire WebGL context
+    const gl = canvas.getContext('webgl', {
+      alpha: true,
+      antialias: false,
+      powerPreference: 'low-power',
+    });
 
-    // Check WebGL support
-    let renderer: InstanceType<typeof THREE.WebGLRenderer>;
-    try {
-      renderer = new THREE.WebGLRenderer({ 
-        canvas, 
-        alpha: true,
-        antialias: false, // Better performance
-        powerPreference: 'low-power' // Battery optimization
-      });
-    } catch (e) {
-      // WebGL not supported, show fallback
+    if (!gl) {
       console.warn('WebGL not supported, showing fallback');
       if (fallback) {
         fallback.style.display = 'block';
@@ -192,106 +239,91 @@ const base = import.meta.env.BASE_URL;
       return;
     }
 
-    // Setup
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const lineColor = 0xECECEC; // Ash grey
+    // Compile & link shaders
+    const program = linkProgram(gl, vertexShader, fragmentShader);
+    if (!program) return;
 
-    // Scene setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(0, width, 0, height, 1, 2);
-    camera.position.z = 2;
+    gl.useProgram(program);
 
-    renderer.setClearColor(0xF9F6EE, 1); // Bone white background
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap at 2x for performance
+    // ── Geometry: fullscreen quad (two triangles in clip space) ──────────
+    const posAttr = gl.getAttribLocation(program, 'a_position');
+    const quadBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        -1, -1,   1, -1,  -1,  1,   // triangle 1
+        -1,  1,   1, -1,   1,  1,   // triangle 2
+      ]),
+      gl.STATIC_DRAW,
+    );
+    gl.enableVertexAttribArray(posAttr);
+    gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
 
-    const clock = new THREE.Clock();
+    // ── Uniform locations ───────────────────────────────────────────────
+    const uColor = gl.getUniformLocation(program, 'color');
+    const uTime = gl.getUniformLocation(program, 'time');
+    const uResolution = gl.getUniformLocation(program, 'resolution');
 
-    // Create plane geometry
-    const geometry = new THREE.PlaneGeometry(width, height);
-    geometry.translate(width / 2, height / 2, 0);
+    // Line color: ash grey (#D4D4D4)
+    gl.uniform3f(uColor, 212 / 255, 212 / 255, 212 / 255);
 
-    // Create shader material
-    const material = new THREE.ShaderMaterial({
-      uniforms: {
-        color: { value: new THREE.Color(lineColor) },
-        time: { value: 0 },
-        resolution: { value: new THREE.Vector2(width, height) }
-      },
-      vertexShader: vertexShader,
-      fragmentShader: simplexNoise + fragmentShader,
-      side: THREE.BackSide,
-      transparent: true
+    // Clear color: bone white (#F9F6EE)
+    gl.clearColor(249 / 255, 246 / 255, 238 / 255, 1.0);
+
+    // ── Resize handler ──────────────────────────────────────────────────
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      gl!.viewport(0, 0, canvas.width, canvas.height);
+      gl!.uniform2f(uResolution, w, h);
+    }
+    resize();
+
+    // Debounced resize
+    let resizeTimeout: ReturnType<typeof setTimeout>;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resize, 100);
     });
 
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-
-    // Animation state
+    // ── Animation state ─────────────────────────────────────────────────
     let animationId: number;
     let isVisible = true;
     let frameCount = 0;
-    
-    // Performance optimization constants
-    const TIME_LOOP_DURATION = 120.0; // Reset time every 120 seconds to prevent floating-point precision loss
-    const FRAME_SKIP = 2; // Render every 2nd frame (set to 1 to disable skipping)
+    let startTime = performance.now();
 
-    // Visibility change handler for battery optimization
+    const TIME_LOOP_DURATION = 120.0; // seconds before wrapping to avoid float precision loss
+    const FRAME_SKIP = 2;             // render every 2nd frame
+
+    // Pause when tab hidden for battery optimisation
     function handleVisibilityChange() {
       if (document.hidden) {
         isVisible = false;
       } else {
         isVisible = true;
-        clock.start(); // Reset clock to prevent time jump
-        frameCount = 0; // Reset frame counter
+        startTime = performance.now(); // reset to prevent time jump
+        frameCount = 0;
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Handle resize
-    function handleResize() {
-      const newWidth = window.innerWidth;
-      const newHeight = window.innerHeight;
-
-      camera.right = newWidth;
-      camera.bottom = newHeight;
-      camera.updateProjectionMatrix();
-
-      renderer.setSize(newWidth, newHeight);
-      material.uniforms.resolution.value.set(newWidth, newHeight);
-
-      // Update geometry
-      mesh.geometry.dispose();
-      const newGeometry = new THREE.PlaneGeometry(newWidth, newHeight);
-      newGeometry.translate(newWidth / 2, newHeight / 2, 0);
-      mesh.geometry = newGeometry;
-    }
-
-    // Debounced resize
-    let resizeTimeout: NodeJS.Timeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(handleResize, 100);
-    });
-
-    // Animation loop
+    // ── Render loop ─────────────────────────────────────────────────────
     function animate() {
       animationId = requestAnimationFrame(animate);
-
-      // Skip rendering if tab is not visible
       if (!isVisible) return;
 
-      // Frame skipping for performance (render every Nth frame)
       frameCount++;
       if (frameCount % FRAME_SKIP !== 0) return;
 
-      // Use modulo time to prevent floating-point precision loss after long sessions
-      // This creates a seamless loop since the noise pattern is continuous
-      const elapsedTime = clock.getElapsedTime();
-      material.uniforms.time.value = elapsedTime % TIME_LOOP_DURATION;
-      
-      renderer.render(scene, camera);
+      const elapsed = (performance.now() - startTime) / 1000;
+      gl!.uniform1f(uTime, elapsed % TIME_LOOP_DURATION);
+
+      gl!.clear(gl!.COLOR_BUFFER_BIT);
+      gl!.drawArrays(gl!.TRIANGLES, 0, 6);
     }
     animate();
 
@@ -300,16 +332,13 @@ const base = import.meta.env.BASE_URL;
       canvas.classList.add('loaded');
     });
 
-    // Cleanup on page navigation (for Astro)
+    // ── Cleanup on Astro page navigation ────────────────────────────────
     function cleanup() {
       cancelAnimationFrame(animationId);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      renderer.dispose();
-      geometry.dispose();
-      material.dispose();
+      gl!.deleteBuffer(quadBuffer);
+      gl!.deleteProgram(program);
     }
-
-    // Listen for Astro navigation
     document.addEventListener('astro:before-preparation', cleanup, { once: true });
   }
 

@@ -627,24 +627,32 @@ const experiences = await Promise.all(
       }
     });
 
-    // Calculate cumulative heights for sequential animation
     const itemsArray = Array.from(items);
     const markersArray = Array.from(markers) as HTMLElement[];
-    
-    // Get total timeline height and individual card info
-    const getCardInfo = () => {
-      return itemsArray.map((item, index) => {
-        const card = item.querySelector('.timeline-card') as HTMLElement;
-        const marker = markersArray[index];
-        return {
-          item,
-          card,
-          marker,
-          height: card?.offsetHeight || 0,
-          top: (item as HTMLElement).offsetTop
-        };
+    const totalItems = itemsArray.length;
+    const segmentSize = 1 / totalItems;
+
+    // Pre-resolve card/marker elements once
+    const itemData = itemsArray.map((item, index) => {
+      const card = item.querySelector('.timeline-card') as HTMLElement;
+      const marker = markersArray[index];
+      return { item, card, marker };
+    });
+
+    // Cache layout measurements (offsetHeight) — updated on init & resize
+    let cachedRanges: number[] = [];
+
+    function cacheHeights() {
+      cachedRanges = itemData.map(({ card, marker }) => {
+        if (!card || !marker) return 0;
+        return card.offsetHeight - marker.offsetHeight - 16; // 16px bottom padding
       });
-    };
+    }
+
+    cacheHeights();
+
+    // Recache on resize (debounced by ScrollTrigger.refresh)
+    ScrollTrigger.addEventListener('refresh', cacheHeights);
 
     // Main scroll progress for the line fill
     ScrollTrigger.create({
@@ -654,27 +662,18 @@ const experiences = await Promise.all(
       end: 'bottom 30%',
       scrub: 0.5,
       onUpdate: (self) => {
-        gsap.to(progressLine, {
-          height: `${self.progress * 100}%`,
-          duration: 0.1,
-          ease: 'none'
+        gsap.set(progressLine, {
+          height: `${self.progress * 100}%`
         });
       }
     });
 
     // Sequential animation for markers
     // Each marker moves within its card height, but only after the previous one completes
-    const totalItems = itemsArray.length;
-    
-    itemsArray.forEach((item, index) => {
-      const marker = markersArray[index];
-      const card = item.querySelector('.timeline-card') as HTMLElement;
-      
+    itemData.forEach(({ item, card, marker }, index) => {
       if (!marker || !card) return;
 
-      // Calculate the scroll range for this specific item
       // Each item gets an equal portion of the total scroll
-      const segmentSize = 1 / totalItems;
       const startProgress = index * segmentSize;
       const endProgress = (index + 1) * segmentSize;
 
@@ -690,26 +689,15 @@ const experiences = await Promise.all(
           let itemProgress = 0;
           
           if (self.progress >= endProgress) {
-            // This item's animation is complete
             itemProgress = 1;
           } else if (self.progress > startProgress) {
-            // Currently animating this item
             itemProgress = (self.progress - startProgress) / segmentSize;
           }
-          // else: Not yet started (itemProgress stays 0)
 
-          // Calculate movement range
-          const cardHeight = card.offsetHeight;
-          const markerHeight = marker.offsetHeight;
-          const range = cardHeight - markerHeight - 16; // 16px padding from bottom
+          // Use cached range instead of reading offsetHeight every frame
+          const yPos = itemProgress * cachedRanges[index];
           
-          const yPos = itemProgress * range;
-          
-          gsap.to(marker, {
-            y: yPos,
-            duration: 0.15,
-            ease: 'power1.out'
-          });
+          gsap.set(marker, { y: yPos });
         }
       });
 
@@ -729,7 +717,7 @@ const experiences = await Promise.all(
       });
     });
 
-    // Handle resize - refresh ScrollTrigger
+    // Refresh triggers (also fires the 'refresh' event which recaches heights)
     ScrollTrigger.refresh();
   }
 
