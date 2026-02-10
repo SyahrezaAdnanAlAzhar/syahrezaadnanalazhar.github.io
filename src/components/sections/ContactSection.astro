@@ -1,14 +1,10 @@
 ---
 import SectionHeading from '../ui/SectionHeading.astro';
+import { EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID } from '../../constants/emailjs';
 
 // Get base URL for image paths
 const base = import.meta.env.BASE_URL;
 const baseUrl = base.endsWith('/') ? base : `${base}/`;
-
-// EmailJS config from environment variables
-const emailjsPublicKey = import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY;
-const emailjsServiceId = import.meta.env.PUBLIC_EMAILJS_SERVICE_ID;
-const emailjsTemplateId = import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID;
 
 // Social media links
 const socialLinks = [
@@ -204,9 +200,9 @@ const emailParts = ['syahreza', '.', 'adnan29', '@', 'gmail', '.', 'com'];
 <script 
   id="emailjs-config" 
   type="application/json"
-  data-public-key={emailjsPublicKey}
-  data-service-id={emailjsServiceId}
-  data-template-id={emailjsTemplateId}
+  data-public-key={EMAILJS_PUBLIC_KEY}
+  data-service-id={EMAILJS_SERVICE_ID}
+  data-template-id={EMAILJS_TEMPLATE_ID}
 ></script>
 
 <style>
