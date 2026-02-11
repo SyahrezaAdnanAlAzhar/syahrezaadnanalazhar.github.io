@@ -47,7 +47,7 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
               <div class="hero-circle"></div>
               <!-- Profile Image -->
               <img 
-                src={`${baseUrl}images/profile_picture_transparent.png`}
+                src={`${baseUrl}images/profile_picture_transparent.webp`}
                 alt="Syahreza Adnan"
                 class="hero-profile-img"
                 loading="eager"
@@ -102,7 +102,7 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
             <div class="hero-circle"></div>
             <!-- Profile Image -->
             <img 
-              src={`${baseUrl}images/profile_picture_transparent.png`}
+              src={`${baseUrl}images/profile_picture_transparent.webp`}
               alt="Syahreza Adnan"
               class="hero-profile-img"
               loading="eager"
@@ -289,6 +289,17 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
     background-image: linear-gradient(to right, rgb(221 214 254) 100%, rgb(221 214 254) 100%);
     background-color: transparent;
   }
+
+  .hero-greeting,
+  .hero-name,
+  .hero-role,
+  .hero-education,
+  .hero-description,
+  .hero-cta,
+  .scroll-indicator {
+    opacity: 0;
+    visibility: hidden;
+  }
 </style>
 
 <script>
@@ -361,6 +372,27 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
     }
 
     const mm = gsap.matchMedia();
+
+    // Wait for the hero profile image to be fully decoded before animating
+    async function waitForHeroImage(): Promise<void> {
+      const img = document.querySelector('.hero-profile-img') as HTMLImageElement | null;
+      if (!img) return;
+
+      // If already fully loaded and decoded, return immediately
+      if (img.complete && img.naturalWidth > 0) {
+        try { await img.decode(); } catch { /* already decoded */ }
+        return;
+      }
+
+      // Race between image decode and a timeout fallback (3s)
+      return new Promise<void>((resolve) => {
+        const timeout = setTimeout(() => resolve(), 3000);
+
+        img.decode()
+          .then(() => { clearTimeout(timeout); resolve(); })
+          .catch(() => { clearTimeout(timeout); resolve(); });
+      });
+    }
 
     // Common animation for all screen sizes
     const animateHero = () => {
@@ -493,19 +525,22 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
       return tl;
     };
 
-    // Desktop animations (≥1024px)
-    mm.add("(min-width: 1024px)", () => {
-      animateHero();
-    });
+    // Wait for hero image to be decoded, then start animations
+    waitForHeroImage().then(() => {
+      // Desktop animations (≥1024px)
+      mm.add("(min-width: 1024px)", () => {
+        animateHero();
+      });
 
-    // Tablet animations (768px-1023px)
-    mm.add("(min-width: 768px) and (max-width: 1023px)", () => {
-      animateHero();
-    });
+      // Tablet animations (768px-1023px)
+      mm.add("(min-width: 768px) and (max-width: 1023px)", () => {
+        animateHero();
+      });
 
-    // Mobile animations (<768px)
-    mm.add("(max-width: 767px)", () => {
-      animateHero();
+      // Mobile animations (<768px)
+      mm.add("(max-width: 767px)", () => {
+        animateHero();
+      });
     });
 
     heroCleanup = () => {
