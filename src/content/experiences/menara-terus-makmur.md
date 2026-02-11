@@ -4,7 +4,7 @@ company: "PT. Menara Terus Makmur, a Member of Astra Otoparts Group"
 location: "Bekasi, Indonesia"
 startDate: "July 2025"
 endDate: "Sep 2025"
-image: "images/experiences/mtm-logo.png"
+image: "images/experiences/mtm-logo.webp"
 techStack:
   ["PHP", "Laravel", "JavaScript", "MySQL", "WebSockets", "Cron Jobs", "Docker"]
 order: 3

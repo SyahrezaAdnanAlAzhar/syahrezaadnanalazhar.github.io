@@ -2,7 +2,7 @@
 title: "Dense-UNet Architecture: Indonesian Food Semantic Segmentation"
 projectType: "ai"
 category: "Semantic Segmentation"
-image: "images/projects/dense-unet-architecture/cover.svg"
+image: "images/projects/dense-unet-architecture/cover.webp"
 description: "Proposed a semantic segmentation model based on the U-Net architecture, using DenseNet as the encoder and ASPP as the bottleneck module. The model was compared against existing baseline models, including DeepLabV3 with ResNet-50 and YOLOv11-M-Seg. The dataset used consisted of Indonesian food images collected through web scraping."
 techStack: ["TensorFlow", "OpenCV", "PyTorch", "Ultralytics"]
 order: 1
@@ -18,6 +18,7 @@ import Mark from "@/components/content/Mark.astro";
 import Table from "@/components/content/Table.astro";
 import LinkButtons from "@/components/content/LinkButtons.astro";
 import LinkButton from "@/components/content/LinkButton.astro";
+import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
 
 <LinkButtons>
   <LinkButton
@@ -76,18 +77,30 @@ import LinkButton from "@/components/content/LinkButton.astro";
 
 <ImageGrid cols={2}>
   <Img
-    src="/images/projects/dense-unet-architecture/ayam1.svg"
-    caption="Original image sample ayam 1"
+    src="/images/projects/dense-unet-architecture/original_image_sample_fried_chicken.webp"
+    caption="Original Image Sample Fried Chicken"
   />
   <Img
-    src="/images/projects/dense-unet-architecture/ayam2.png"
-    caption="Original image sample ayam 2"
+    src="/images/projects/dense-unet-architecture/annotated_image_sample_fried_chicken.webp"
+    caption="Annotated Image Sample Fried Chicken"
   />
   <Img
-    src="/images/projects/dense-unet-architecture/ayam3.png"
-    caption="Original image sample ayam 3"
+    src="/images/projects/dense-unet-architecture/original_image_sample_vegetable_soup.webp"
+    caption="Original Image Sample Vegetable Soup"
+  />
+  <Img
+    src="/images/projects/dense-unet-architecture/annotated_image_sample_vegetable_soup.webp"
+    caption="Annotated Image Sample Vegetable Soup"
   />
 </ImageGrid>
+
+<SocialMediaCard
+  href="https://app.roboflow.com/scan-gizi-makanan/scan-gizi-makanan"
+  thumbnail="images/contacts/roboflow.svg"
+  platform="Roboflow Dataset Link"
+  icon="images/contacts/roboflow-logo.svg"
+  caption="The food dataset used for training segmentation models in this project."
+/>
 
 </Section>
 
@@ -132,7 +145,7 @@ import LinkButton from "@/components/content/LinkButton.astro";
 <Table>
   | <B>Component</B> | <B>Configuration Details</B> |
   | ------- | ----------------------------------- |
-  | Input Resolution | 512 × 512 pixels |
+  | Input Resolution | 640 × 640 pixels |
   | Data Augmentation | On-the-fly random flips, rotations, and brightness adjustments |
   | Splitting Strategy | Stratified sampling (to maintain class balance across Train/Val/Test) |
   | Optimizer | Adam with scheduled learning rate decay |

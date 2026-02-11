@@ -4,7 +4,7 @@ company: "INA Digital, Peruri"
 location: "Jakarta, Indonesia"
 startDate: "Oct 2025"
 endDate: "Present"
-image: "images/experiences/ina-digital-logo.jpg"
+image: "images/experiences/ina-digital-logo.webp"
 techStack: ["Go", "JavaScript", "NodeJS", "React", "MySQL", "Docker", "SMTP"]
 order: 1
 isRemote: false
