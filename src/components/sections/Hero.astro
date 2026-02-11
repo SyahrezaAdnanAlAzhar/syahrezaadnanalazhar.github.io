@@ -297,6 +297,8 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
 
   gsap.registerPlugin(ScrollTrigger);
 
+  let heroCleanup = () => {};
+
   function getGreeting(): string {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {
@@ -311,6 +313,9 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
   }
 
   function initHeroAnimations() {
+    // Kill previous matchMedia/ScrollTrigger instances for this component
+    heroCleanup();
+
     // Update greeting based on local time
     const greetingElements = document.querySelectorAll('.hero-greeting');
     const greeting = getGreeting();
@@ -502,6 +507,10 @@ const baseUrl = base.endsWith('/') ? base : `${base}/`;
     mm.add("(max-width: 767px)", () => {
       animateHero();
     });
+
+    heroCleanup = () => {
+      mm.revert();
+    };
   }
 
   // Initialize on page load

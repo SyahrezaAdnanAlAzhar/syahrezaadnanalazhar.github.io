@@ -445,8 +445,14 @@ const techStackCategories: TechCategory[] = [
 
   gsap.registerPlugin(ScrollTrigger);
 
+  let techStackCleanup = () => {};
+
   function initTechStackAnimations() {
+    // Kill previous ScrollTrigger instances for this component
+    techStackCleanup();
+
     const cards = document.querySelectorAll('.tech-card');
+    const tweens: gsap.core.Tween[] = [];
     
     cards.forEach((card, cardIndex) => {
       const badges = card.querySelectorAll('.tech-badge');
@@ -455,7 +461,7 @@ const techStackCategories: TechCategory[] = [
       gsap.set(card, { opacity: 0, y: 30 });
       
       // Card entrance animation
-      gsap.to(card, {
+      const cardTween = gsap.to(card, {
         scrollTrigger: {
           trigger: card,
           start: 'top 85%',
@@ -467,12 +473,13 @@ const techStackCategories: TechCategory[] = [
         delay: cardIndex * 0.05,
         ease: 'power2.out'
       });
+      tweens.push(cardTween);
 
       // Set initial state for badges and animate them
       if (badges.length > 0) {
         gsap.set(badges, { opacity: 0, scale: 0.9 });
         
-        gsap.to(badges, {
+        const badgeTween = gsap.to(badges, {
           scrollTrigger: {
             trigger: card,
             start: 'top 80%',
@@ -488,8 +495,16 @@ const techStackCategories: TechCategory[] = [
           delay: 0.15 + cardIndex * 0.05,
           ease: 'power2.out'
         });
+        tweens.push(badgeTween);
       }
     });
+
+    techStackCleanup = () => {
+      tweens.forEach(t => {
+        t.scrollTrigger?.kill();
+        t.kill();
+      });
+    };
   }
 
   // Initialize on page load

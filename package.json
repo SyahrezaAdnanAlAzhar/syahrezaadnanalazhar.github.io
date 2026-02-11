@@ -13,7 +13,6 @@
     "@emailjs/browser": "^4.4.1",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.5",
-    "flubber": "^0.4.2",
     "gsap": "^3.14.2",
     "material-icons": "^1.13.14",
     "three": "^0.182.0"

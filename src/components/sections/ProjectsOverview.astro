@@ -462,15 +462,21 @@ const aiProjects = allProjects
 
   gsap.registerPlugin(ScrollTrigger);
 
+  let projectsCleanup = () => {};
+
   function initProjectsAnimations() {
+    // Kill previous ScrollTrigger instances for this component
+    projectsCleanup();
+
     const cards = document.querySelectorAll('.project-card');
+    const tweens: gsap.core.Tween[] = [];
     
     cards.forEach((card, cardIndex) => {
       // Set initial state
       gsap.set(card, { opacity: 0, y: 30 });
       
       // Card entrance animation
-      gsap.to(card, {
+      const cardTween = gsap.to(card, {
         scrollTrigger: {
           trigger: card,
           start: 'top 85%',
@@ -482,7 +488,15 @@ const aiProjects = allProjects
         delay: cardIndex * 0.1,
         ease: 'power2.out'
       });
+      tweens.push(cardTween);
     });
+
+    projectsCleanup = () => {
+      tweens.forEach(t => {
+        t.scrollTrigger?.kill();
+        t.kill();
+      });
+    };
   }
 
   if (document.readyState === 'loading') {
