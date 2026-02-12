@@ -10,6 +10,7 @@ import AwardMeta from "@/components/content/AwardMeta.astro";
 import Section from "@/components/content/Section.astro";
 import P from "@/components/content/P.astro";
 import B from "@/components/content/B.astro";
+import Mark from "@/components/content/Mark.astro";
 import ImageGrid from "@/components/content/ImageGrid.astro";
 import Img from "@/components/content/Img.astro";
 import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
@@ -36,11 +37,7 @@ import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
 
 <Section title="Problem Context" defaultOpen={true}>
   <P>
-    Nutritional monitoring in Indonesia still relies on manual 24-hour dietary
-    recall, which is prone to recall bias, inaccurate portion estimation, and
-    subjectivity. This limitation directly impacts early detection of stunting
-    and malnutrition, especially in community-based healthcare settings such as
-    posyandu.
+    Nutritional monitoring in Indonesia still <Mark>relies on manual 24-hour dietary recall</Mark>, which is prone to recall bias, inaccurate portion estimation, and subjectivity. This limitation directly <Mark>impacts early detection of stunting and malnutrition</Mark>, especially in community-based healthcare settings such as posyandu.
   </P>
 </Section>
 
@@ -50,31 +47,39 @@ import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
 
 <Section title="Responsibilities" defaultOpen={true}>
   <P>
-    <B>Syahreza Adnan Al Azhar (Team Lead)</B>
+    <B><Mark>Syahreza Adnan Al Azhar (Team Lead)</Mark></B>
   </P>
   <ul class="custom-list">
     <li>
-      Led a cross-functional team to design and deliver an AI-powered nutrition
-      monitoring application
+      Led a cross-functional team to design and deliver the TumbuhSehat application
     </li>
     <li>
-      Authored and defended the national-level funded proposal and final report
+      Authored the funded proposal and final report
     </li>
     <li>
-      Designed and implemented the mobile application (Flutter, BLoC
-      architecture)
-    </li>
-    <li>Developed the food semantic segmentation pipeline (DeepLabV3)</li>
-    <li>
-      Integrated monocular depth estimation (MiDaS) for food volume estimation
+      Designed and implemented the mobile application (Flutter, Clean architecture)
     </li>
     <li>
-      Designed end-to-end AI → nutrition analysis pipeline aligned with Kemenkes
-      & WHO standards
+      Conducted model experiments for semantic segmentation of food (Dense UNet, DeepLabV3, YOLOv11 seg)
+    </li>
+    <li>
+      Designed an end-to-end nutrition calculation workflow aligned with Ministry of Health & WHO standards
+    </li>
+    <li>
+      Contributed to the UI UX design of the TumbuhSehat application
     </li>
   </ul>
   <P>
-    <B>Puri Lalita Anagata</B> — UI/UX
+    <B>Puri Lalita Anagata</B> — Managed project timeline and task; contributed to the UI UX design; contributed to writing the proposal and final report
+  </P>
+  <P>
+    <B>Muhammad Fajar Mufid</B> — Designed and developed backend service
+  </P>
+  <P>
+    <B>Yolanda Rahmah Christy</B> — Contributed to the UI UX design; designed the social media of TumbuhSehat
+  </P>
+  <P>
+    <B>Valentino Hartanto</B> — Contributed to writing the proposal and final report; conducted model experiments for depth estimation (MiDaS, DPT, Open3D, ColMap)
   </P>
 </Section>
 
@@ -84,11 +89,7 @@ import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
 
 <Section title="Technical Architecture" defaultOpen={false}>
   <P>
-    The system combines semantic segmentation and monocular depth estimation to
-    estimate food volume from a single top-down image. Segmentation masks are
-    fused with calibrated depth maps to compute food volume, which is then
-    mapped to nutritional values using TKPI, AKG, and WHO Child Growth
-    Standards.
+    <B>The system combines semantic segmentation and monocular depth estimation to estimate food volume from a single top-down image</B>. Segmentation masks are fused with calibrated depth maps to compute food volume, which is then mapped to nutritional values using Ministry of Health Standards, and WHO Child Growth Standards. The applied Ministry of Health standards include the Nutritional Adequacy Rate (Angka Kecukupan Gizi - AKG), the Indonesian Food Composition Table (Tabel Komposisi Pangan Indonesia - TKPI), and the Food Exchange List (Daftar Bahan Makanan Penukar).
   </P>
 </Section>
 
@@ -119,7 +120,7 @@ import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
     <B>Model Performance</B>
   </P>
   <ul class="custom-list">
-    <li>Segmentation mIoU: 95%</li>
+    <li>Segmentation mIoU: 93%</li>
     <li>Depth estimation MRE: 4%, AbsRel: 6%</li>
   </ul>
   <P>
@@ -137,19 +138,45 @@ import SocialMediaCard from "@/components/content/SocialMediaCard.astro";
 {/* ========================================================================= */}
 
 <Section title="Evidence" defaultOpen={false}>
-  <ImageGrid cols={2}>
-    <Img src="images/awards/2-pkm-kc-2025-national-funding-award/logo.svg" caption="Award Certificate" />
-    <Img src="images/awards/2-pkm-kc-2025-national-funding-award/logo.svg" caption="Team Photo" />
+  <ImageGrid cols={3}>
+    <Img 
+      src="images/awards/2-pkm-kc-2025-national-funding-award/certificate.webp" 
+      caption="Award Certificate"
+    />
+    <Img 
+      src="images/awards/2-pkm-kc-2025-national-funding-award/socialization-documentation.webp" 
+      caption="Socialization Documentation"
+    />
+    <Img 
+      src="images/awards/2-pkm-kc-2025-national-funding-award/documentation-with-nutritionists-and-village-midwives.webp" 
+      caption="Documentation with Nutritionists and Village Midwives"
+    />
   </ImageGrid>
 
 {/* Social Media Evidence */}
 
   <SocialMediaCard
-    href="https://www.instagram.com/p/example"
-    thumbnail="images/awards/2-pkm-kc-2025-national-funding-award/logo.svg"
-    platform="Instagram"
+    href="https://www.instagram.com/tumbuhsehat.kc/"
+    thumbnail="images/contacts/instagram.svg"
+    platform="Instagram Link"
     icon="images/contacts/instagram.svg"
-    caption="Publication Announcement"
+    caption="TumbuhSehat's Social Media"
+  />
+
+  <SocialMediaCard
+    href="https://github.com/TumbuhSehatTelU"
+    thumbnail="images/contacts/github.svg"
+    platform="Organization Repository Link"
+    icon="images/contacts/github.svg"
+    caption="TumbuhSehat's Repository"
+  />
+
+  <SocialMediaCard
+    href="https://drive.google.com/file/d/1Zw3sBPTbXbffy6tSBBoIFMwjCMyo4gqV/view?usp=sharing"
+    thumbnail="images/awards/2-pkm-kc-2025-national-funding-award/intellectual-property-rights.webp"
+    platform="File Link"
+    icon="images/contacts/ministry-of-law.svg"
+    caption="Intellectual Property Rights of TumbuhSehat Application"
   />
 </Section>
 
